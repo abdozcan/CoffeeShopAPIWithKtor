@@ -1,6 +1,7 @@
 package com.example.data.database.dao
 
 import com.example.data.database.table.FavoriteTable
+import com.example.data.database.table.ProductTable
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -10,4 +11,6 @@ class FavoriteEntity(id: EntityID<Int>) : IntEntity(id) {
 
     val userId by FavoriteTable.userId
     val productId by FavoriteTable.productId
+
+    val products by ProductEntity referrersOn ProductTable.id
 }

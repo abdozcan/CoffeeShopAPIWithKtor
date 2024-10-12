@@ -41,23 +41,23 @@ fun ResultRow.toProduct() = Product(
 
 fun ResultRow.toOrder() = Order(
     id = this[OrderTable.id].value,
-    userId = this[OrderTable.userId],
+    userId = this[OrderTable.userId].value,
     orderDate = this[OrderTable.orderDate],
     amount = this[OrderTable.amount],
     status = this[OrderTable.status]
 )
 
 fun ResultRow.toOrderItem() = OrderItem(
-    id = this[OrderItemEntity.id].value,
-    orderId = this[OrderItemEntity.orderId],
-    productId = this[OrderItemEntity.productId],
-    quantity = this[OrderItemEntity.quantity],
-    price = this[OrderItemEntity.price]
+    id = this[OrderItemTable.id].value,
+    orderId = this[OrderItemTable.orderId].value,
+    productId = this[OrderItemTable.productId].value,
+    quantity = this[OrderItemTable.quantity],
+    price = this[OrderItemTable.price]
 )
 
 fun ResultRow.toPayment() = Payment(
     id = this[PaymentTable.id].value,
-    orderId = this[PaymentTable.orderId],
+    orderId = this[PaymentTable.orderId].value,
     paymentDate = this[PaymentTable.paymentDate],
     amount = this[PaymentTable.amount],
     method = this[PaymentTable.method]
@@ -65,6 +65,6 @@ fun ResultRow.toPayment() = Payment(
 
 fun ResultRow.toFavorite() = Favorite(
     id = this[FavoriteTable.id].value,
-    userId = this[FavoriteTable.userId],
-    productId = this[FavoriteTable.productId]
+    userId = this[FavoriteTable.userId].value,
+    productId = this[FavoriteTable.productId].value
 )

@@ -12,7 +12,7 @@ object ProductTable : IntIdTable("products") {
     val grindOption = text("grind_option")
     val roastLevel = integer("roast_level")
     val imageUrl = text("image_url").uniqueIndex()
-    val category = text("category")
+    val category = reference("category", refColumn = CategoryTable.name)
     val stockQuantity = integer("stock_quantity")
     val popularityRating = float("popularity_rating")
     val discountPrice = float("discount_price").nullable()  // REAL can be nullable

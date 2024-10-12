@@ -30,7 +30,6 @@ dependencies {
     implementation(libs.ktor.server.config.yaml)
     implementation(libs.exposed.core)
     implementation(libs.exposed.dao)
-    implementation(libs.exposed.sql)
     implementation(libs.exposed.jdbc)
     implementation(libs.exposed.java.time)
     implementation(libs.sqlite.jdbc)

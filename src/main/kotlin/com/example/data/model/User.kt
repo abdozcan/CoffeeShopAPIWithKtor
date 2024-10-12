@@ -1,0 +1,19 @@
+package com.example.data.model
+
+import com.example.utils.LocalDateTimeSerializer
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import java.time.LocalDateTime
+
+@Serializable
+data class User(
+    val id: Int,
+    val name: String,
+    val password: String,
+    val email: String,
+    val phone: String,
+    val address: String,
+    @SerialName("created_at")
+    @Serializable(with = LocalDateTimeSerializer::class)
+    val createdAt: LocalDateTime
+)

@@ -1,8 +1,6 @@
 package com.example.data.database.table
 
-import com.example.data.model.User
 import org.jetbrains.exposed.dao.id.IntIdTable
-import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.javatime.datetime
 
 object OrderTable : IntIdTable("orders") {

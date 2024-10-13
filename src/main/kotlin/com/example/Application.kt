@@ -3,9 +3,6 @@ package com.example
 import com.example.data.database.table.*
 import com.example.data.repository.DefaultProductRepository
 import com.example.data.repository.DefaultUserRepository
-import com.example.data.utils.dbQuery
-import com.example.domain.repository.ProductRepository
-import com.example.domain.repository.UserRepository
 import com.example.plugins.configureSecurity
 import com.example.routes.productRoutes
 import com.example.routes.userRoutes
@@ -13,7 +10,6 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils

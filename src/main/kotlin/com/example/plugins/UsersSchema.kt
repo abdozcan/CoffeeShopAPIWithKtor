@@ -1,6 +1,6 @@
 package com.example.plugins
 
-import com.example.data.utils.dbQuery
+import com.example.data.utils.withTransactionContext
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -24,7 +24,7 @@ class UserService(database: Database) {
         }
     }
 
-    suspend fun create(user: ExposedUser): Int = dbQuery {
+    suspend fun create(user: ExposedUser): Int = withTransactionContext {
         Users.insert {
             it[name] = user.name
             it[age] = user.age
@@ -32,7 +32,7 @@ class UserService(database: Database) {
     }
 
     suspend fun read(id: Int): ExposedUser? {
-        return dbQuery {
+        return withTransactionContext {
             Users.select { Users.id eq id }
                 .map { ExposedUser(it[Users.name], it[Users.age]) }
                 .singleOrNull()
@@ -40,7 +40,7 @@ class UserService(database: Database) {
     }
 
     suspend fun update(id: Int, user: ExposedUser) {
-        dbQuery {
+        withTransactionContext {
             Users.update({ Users.id eq id }) {
                 it[name] = user.name
                 it[age] = user.age
@@ -49,7 +49,7 @@ class UserService(database: Database) {
     }
 
     suspend fun delete(id: Int) {
-        dbQuery {
+        withTransactionContext {
             Users.deleteWhere { Users.id.eq(id) }
         }
     }

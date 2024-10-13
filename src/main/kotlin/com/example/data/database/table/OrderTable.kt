@@ -9,7 +9,7 @@ object OrderTable : IntIdTable("orders") {
     val userId = reference("user_id", foreign = UserTable)
     val orderDate = datetime("order_date")
     val status = enumerationByName("status", 50, OrderStatus::class)
-    val totalAmount = decimal("total_amount", 10, 2)
+    val totalAmount = double("total_amount")
     val shippingAddress = text("shipping_address")
     val paymentMethod = varchar("payment_method", 100)
     val createdAt = datetime("created_at").defaultExpression(CurrentDateTime)

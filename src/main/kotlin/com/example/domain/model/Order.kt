@@ -16,7 +16,7 @@ data class Order(
     val orderDate: LocalDateTime,
     val status: OrderStatus,
     @SerialName("total_amount")
-    val totalAmount: BigDecimal,
+    val totalAmount: Double,
     @SerialName("shipping_address")
     val shippingAddress: String,
     @SerialName("payment_method")

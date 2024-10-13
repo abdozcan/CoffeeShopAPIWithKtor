@@ -11,5 +11,5 @@ data class OrderItem(
     @SerialName("product_id")
     val productId: Int,
     val quantity: Int,
-    val price: Float
+    val price: Double
 )

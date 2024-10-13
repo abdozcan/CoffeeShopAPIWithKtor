@@ -7,5 +7,5 @@ object OrderItemTable : IntIdTable("order_items") {
     val orderId = reference("order_id", foreign = OrderTable, onDelete = ReferenceOption.CASCADE)
     val productId = reference("product_id", foreign = ProductTable)
     val quantity = integer("quantity")
-    val price = float("price")
+    val price = double("price")
 }

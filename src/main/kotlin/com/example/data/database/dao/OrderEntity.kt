@@ -12,20 +12,28 @@ class OrderEntity(id: EntityID<Int>) : IntEntity(id) {
 
     var userId by OrderTable.userId
     var orderDate by OrderTable.orderDate
-    var amount by OrderTable.amount
     var status by OrderTable.status
+    var totalAmount by OrderTable.totalAmount
+    var shippingAddress by OrderTable.shippingAddress
+    var paymentMethod by OrderTable.paymentMethod
+    var createdAt by OrderTable.createdAt
+    var updatedAt by OrderTable.updatedAt
 
     val orderItems by OrderItemEntity referrersOn OrderItemTable.orderId
-   /* val products = orderItems.mapNotNull {
-        ProductEntity.findById(it.productId)
-    }*/
+    /* val products = orderItems.mapNotNull {
+         ProductEntity.findById(it.productId)
+     }*/
 
     fun toOrder() = Order(
         id = id.value,
         userId = userId.value,
         orderDate = orderDate,
-        amount = amount,
         status = status,
+        totalAmount = totalAmount,
+        shippingAddress = shippingAddress,
+        paymentMethod = paymentMethod,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
         orderItems = orderItems.map { it.toOrderItem() }
     )
 }

@@ -2,7 +2,7 @@ package com.example.data.utils
 
 import io.ktor.server.plugins.*
 
-inline fun <T, R: Any> T?.toOrThrowIfNull(transform: (T) -> R): R {
+inline fun <T, R: Any> T?.doOrThrowIfNull(transform: (T) -> R): R {
     return this?.let(transform) ?: throw NotFoundException("Not Found.")
 }
 

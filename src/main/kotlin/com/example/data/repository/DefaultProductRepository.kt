@@ -5,7 +5,7 @@ import com.example.data.database.dao.ProductEntity
 import com.example.data.database.table.FavoriteTable
 import com.example.data.database.table.ProductTable
 import com.example.data.utils.flatMapOrTrowIfEmpty
-import com.example.data.utils.toOrThrowIfNull
+import com.example.data.utils.doOrThrowIfNull
 import com.example.data.utils.withTransactionContext
 import com.example.domain.model.Product
 import com.example.domain.repository.ProductRepository
@@ -19,7 +19,7 @@ class DefaultProductRepository : ProductRepository {
 
     override suspend fun findById(id: Int): Result<Product> = runCatching {
         withTransactionContext {
-            ProductEntity.findById(id).toOrThrowIfNull { it.toProduct() }
+            ProductEntity.findById(id).doOrThrowIfNull { it.toProduct() }
         }
     }
 

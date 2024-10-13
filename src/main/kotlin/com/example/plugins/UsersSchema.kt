@@ -1,10 +1,9 @@
 package com.example.plugins
 
-import kotlinx.coroutines.Dispatchers
+import com.example.data.utils.dbQuery
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
 
 @Serializable
@@ -54,8 +53,5 @@ class UserService(database: Database) {
             Users.deleteWhere { Users.id.eq(id) }
         }
     }
-
-    private suspend fun <T> dbQuery(block: suspend () -> T): T =
-        newSuspendedTransaction(Dispatchers.IO) { block() }
 }
 

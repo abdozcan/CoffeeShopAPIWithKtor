@@ -27,5 +27,6 @@ data class Product(
     val discountPrice: Float?,
     @SerialName("discount_percentage")
     val discountPercentage: Float?,
-    val bestseller: Boolean
+    val bestseller: Boolean,
+    val reviews: List<Review>
 )

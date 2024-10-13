@@ -6,7 +6,7 @@ import org.jetbrains.exposed.sql.javatime.datetime
 
 object PromotionTable : IntIdTable("promotions") {
     val productId = reference("product_id", foreign = ProductTable, onDelete = ReferenceOption.CASCADE)
-    val discount = decimal("discount", 4, 2)
+    val discount = float("discount")
     val startDate = datetime("start_date")
     val endDate = datetime("end_date")
     val description = text("description")

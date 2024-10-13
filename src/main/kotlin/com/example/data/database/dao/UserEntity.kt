@@ -1,6 +1,7 @@
 package com.example.data.database.dao
 
 import com.example.data.database.table.*
+import com.example.domain.model.User
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -20,4 +21,13 @@ class UserEntity(id: EntityID<Int>) : IntEntity(id) {
     val reviews by ReviewEntity referrersOn ReviewTable.userId
     val addresses by AddressEntity referrersOn AddressTable.userId
 
+    fun toUser() = User(
+        id = id.value,
+        name = name,
+        password = password,
+        email = email,
+        phone = phone,
+        address = address,
+        createdAt = createdAt
+    )
 }

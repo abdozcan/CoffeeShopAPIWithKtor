@@ -1,7 +1,9 @@
 package com.example.domain.model
 
+import com.example.domain.utils.LocalDateTimeSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.time.LocalDateTime
 
 @Serializable
 data class Promotion(
@@ -10,8 +12,10 @@ data class Promotion(
     val productId: Int,
     val discount: Float,
     @SerialName("start_date")
-    val startDate: String,
+    @Serializable(LocalDateTimeSerializer::class)
+    val startDate: LocalDateTime,
     @SerialName("end_date")
-    val endDate: String,
+    @Serializable(LocalDateTimeSerializer::class)
+    val endDate: LocalDateTime,
     val description: String
 )

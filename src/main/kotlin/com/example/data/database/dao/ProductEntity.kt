@@ -2,6 +2,7 @@ package com.example.data.database.dao
 
 import com.example.data.database.table.ProductTable
 import com.example.data.database.table.ReviewTable
+import com.example.domain.model.Product
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -27,4 +28,24 @@ class ProductEntity(id: EntityID<Int>) : IntEntity(id) {
     val bestseller by ProductTable.bestseller
 
     val reviews by ReviewEntity referrersOn ReviewTable.productId
+
+    fun toProduct() = Product(
+        id = id.value,
+        name = name,
+        description = description,
+        price = price,
+        region = region,
+        weight = weight,
+        flavorProfile = flavorProfile,
+        grindOption = grindOption,
+        roastLevel = roastLevel,
+        imageUrl = imageUrl,
+        category = category,
+        stockQuantity = stockQuantity,
+        popularityRating = popularityRating,
+        discountPrice = discountPrice,
+        discountPercentage = discountPercentage,
+        bestseller = bestseller,
+        reviews = reviews.map { it.toReview() }
+    )
 }

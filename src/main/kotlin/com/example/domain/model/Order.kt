@@ -1,6 +1,6 @@
 package com.example.domain.model
 
-import com.example.data.utils.LocalDateTimeSerializer
+import com.example.domain.utils.LocalDateTimeSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
@@ -14,5 +14,6 @@ data class Order(
     @Serializable(with = LocalDateTimeSerializer::class)
     val orderDate: LocalDateTime,
     val amount: Int,
-    val status: String
+    val status: String,
+    val orderItems: List<OrderItem>
 )

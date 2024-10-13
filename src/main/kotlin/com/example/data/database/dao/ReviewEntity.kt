@@ -10,11 +10,11 @@ import org.jetbrains.exposed.dao.id.EntityID
 class ReviewEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<ReviewEntity>(ReviewTable)
 
-    val productId by ReviewTable.productId
-    val userId by ReviewTable.userId
-    val rating by ReviewTable.rating
-    val comment by ReviewTable.comment
-    val reviewDate by ReviewTable.reviewDate
+    var productId by ReviewTable.productId
+    var userId by ReviewTable.userId
+    var rating by ReviewTable.rating
+    var comment by ReviewTable.comment
+    var reviewDate by ReviewTable.reviewDate
 
     val users by UserEntity referrersOn UserTable.id
 

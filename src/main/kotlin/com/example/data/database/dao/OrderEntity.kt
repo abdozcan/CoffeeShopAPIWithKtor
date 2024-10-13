@@ -10,12 +10,12 @@ import org.jetbrains.exposed.dao.id.EntityID
 class OrderEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<OrderEntity>(OrderTable)
 
-    val userId by OrderTable.userId
-    val orderDate by OrderTable.orderDate
-    val amount by OrderTable.amount
-    val status by OrderTable.status
+    var userId by OrderTable.userId
+    var orderDate by OrderTable.orderDate
+    var amount by OrderTable.amount
+    var status by OrderTable.status
 
-    private val orderItems by OrderItemEntity referrersOn OrderItemTable.orderId
+    val orderItems by OrderItemEntity referrersOn OrderItemTable.orderId
    /* val products = orderItems.mapNotNull {
         ProductEntity.findById(it.productId)
     }*/

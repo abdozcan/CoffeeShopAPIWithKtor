@@ -9,11 +9,11 @@ import org.jetbrains.exposed.dao.id.EntityID
 class PromotionEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<PromotionEntity>(PromotionTable)
 
-    val productId by PromotionTable.productId
-    val discount by PromotionTable.discount
-    val startDate by PromotionTable.startDate
-    val endDate by PromotionTable.endDate
-    val description by PromotionTable.description
+    var productId by PromotionTable.productId
+    var discount by PromotionTable.discount
+    var startDate by PromotionTable.startDate
+    var endDate by PromotionTable.endDate
+    var description by PromotionTable.description
 
     fun toPromotion() = Promotion(
         id = id.value,

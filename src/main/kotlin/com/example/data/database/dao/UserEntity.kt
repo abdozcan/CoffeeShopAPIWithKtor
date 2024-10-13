@@ -9,12 +9,12 @@ import org.jetbrains.exposed.dao.id.EntityID
 class UserEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<UserEntity>(UserTable)
 
-    val name by UserTable.name
-    val password by UserTable.password
-    val email by UserTable.email
-    val phone by UserTable.phone
-    val address by UserTable.address
-    val createdAt by UserTable.createdAt
+    var name by UserTable.name
+    var password by UserTable.password
+    var email by UserTable.email
+    var phone by UserTable.phone
+    var address by UserTable.address
+    var createdAt by UserTable.createdAt
 
     val favorites by FavoriteEntity referrersOn FavoriteTable.userId
     val orders by OrderEntity referrersOn OrderTable.userId

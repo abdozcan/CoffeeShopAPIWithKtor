@@ -10,8 +10,8 @@ import org.jetbrains.exposed.dao.id.EntityID
 class FavoriteEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<FavoriteEntity>(FavoriteTable)
 
-    val userId by FavoriteTable.userId
-    val productId by FavoriteTable.productId
+    var userId by FavoriteTable.userId
+    var productId by FavoriteTable.productId
 
     val products by ProductEntity referrersOn ProductTable.id
 

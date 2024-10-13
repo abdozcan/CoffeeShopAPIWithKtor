@@ -11,21 +11,21 @@ import org.jetbrains.exposed.dao.id.EntityID
 class ProductEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<ProductEntity>(ProductTable)
 
-    val name by ProductTable.name
-    val description by ProductTable.description
-    val price by ProductTable.price
-    val region by ProductTable.region
-    val weight by ProductTable.weight
-    val flavorProfile by ProductTable.flavorProfile
-    val grindOption by ProductTable.grindOption
-    val roastLevel by ProductTable.roastLevel
-    val imageUrl by ProductTable.imageUrl
-    val category by ProductTable.category
-    val stockQuantity by ProductTable.stockQuantity
-    val popularityRating by ProductTable.popularityRating
-    val discountPrice by ProductTable.discountPrice
-    val discountPercentage by ProductTable.discountPercentage
-    val bestseller by ProductTable.bestseller
+    var name by ProductTable.name
+    var description by ProductTable.description
+    var price by ProductTable.price
+    var region by ProductTable.region
+    var weight by ProductTable.weight
+    var flavorProfile by ProductTable.flavorProfile
+    var grindOption by ProductTable.grindOption
+    var roastLevel by ProductTable.roastLevel
+    var imageUrl by ProductTable.imageUrl
+    var category by ProductTable.category
+    var stockQuantity by ProductTable.stockQuantity
+    var popularityRating by ProductTable.popularityRating
+    var discountPrice by ProductTable.discountPrice
+    var discountPercentage by ProductTable.discountPercentage
+    var bestseller by ProductTable.bestseller
 
     val reviews by ReviewEntity referrersOn ReviewTable.productId
 

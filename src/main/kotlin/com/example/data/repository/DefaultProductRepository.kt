@@ -25,20 +25,32 @@ class DefaultProductRepository : ProductRepository {
 
     override suspend fun findByCategory(category: String): Result<List<Product>> = runCatching {
         withTransactionContext {
-            ProductEntity.find { ProductTable.category eq category }.map { it.toProduct() }
+            ProductEntity.find {
+                ProductTable.category eq category
+            }.map {
+                it.toProduct()
+            }
         }
     }
 
     override suspend fun findBestsellers(): Result<List<Product>> = runCatching {
         withTransactionContext {
-            ProductEntity.find { ProductTable.bestseller eq true }.map { it.toProduct() }
+            ProductEntity.find {
+                ProductTable.bestseller eq true
+            }.map {
+                it.toProduct()
+            }
         }
     }
 
     override suspend fun findFavoritedProduct(userId: Int): Result<List<Product>> = runCatching {
         withTransactionContext {
-            FavoriteEntity.find { FavoriteTable.userId eq userId }.flatMapOrTrowIfEmpty {
-                it.products.map { productEntity -> productEntity.toProduct() }
+            FavoriteEntity.find {
+                FavoriteTable.userId eq userId
+            }.flatMapOrTrowIfEmpty {
+                it.products.map {
+                    productEntity -> productEntity.toProduct()
+                }
             }
         }
     }

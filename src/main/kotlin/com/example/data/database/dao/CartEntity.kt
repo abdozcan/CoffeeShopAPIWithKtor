@@ -15,7 +15,7 @@ class CartEntity(id: EntityID<Int>) : IntEntity(id) {
     var expiresAt by CartTable.expiresAt
     var status by CartTable.status
 
-    val items by CartItemEntity referrersOn CartItemTable.cartId
+    val cartItems by CartItemEntity referrersOn CartItemTable.cartId
 
     fun toCart() = Cart(
         id = id.value,
@@ -23,6 +23,6 @@ class CartEntity(id: EntityID<Int>) : IntEntity(id) {
         createdAt = createdAt,
         expiresAt = expiresAt,
         status = status,
-        items = items.map { it.toCartItem() }
+        cartItems = cartItems.map { it.toCartItem() }
     )
 }

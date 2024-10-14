@@ -18,5 +18,5 @@ data class Cart(
     @SerialName("expires_at")
     @Serializable(with = LocalDateTimeSerializer::class)
     val expiresAt: LocalDateTime?,
-    val items: List<CartItem>
+    val cartItems: List<CartItem>
 )

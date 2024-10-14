@@ -1,14 +1,14 @@
 package com.example.domain.model
 
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Serializable
 data class Product(
     val id: Int,
     val name: String,
     val description: String,
-    val price: Float,
+    val price: Double,
     val region: String,
     val weight: Int,
     @SerialName("flavor_profile")
@@ -24,9 +24,9 @@ data class Product(
     @SerialName("popularity_rating")
     val popularityRating: Float,
     @SerialName("discount_price")
-    val discountPrice: Float?,
+    val discountPrice: Double?,
     @SerialName("discount_percentage")
-    val discountPercentage: Float?,
+    val discountPercentage: Double?,
     val bestseller: Boolean,
     val reviews: List<Review>
 )

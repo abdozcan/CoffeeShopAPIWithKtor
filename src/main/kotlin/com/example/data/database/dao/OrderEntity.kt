@@ -20,9 +20,6 @@ class OrderEntity(id: EntityID<Int>) : IntEntity(id) {
     var updatedAt by OrderTable.updatedAt
 
     val orderItems by OrderItemEntity referrersOn OrderItemTable.orderId
-    /* val products = orderItems.mapNotNull {
-         ProductEntity.findById(it.productId)
-     }*/
 
     fun toOrder() = Order(
         id = id.value,

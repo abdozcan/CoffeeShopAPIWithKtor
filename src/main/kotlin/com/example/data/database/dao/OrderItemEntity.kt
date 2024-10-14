@@ -10,14 +10,14 @@ class OrderItemEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<OrderItemEntity>(OrderItemTable)
 
     var orderId by OrderItemTable.orderId
-    var productId by OrderItemTable.productId
+    var product by ProductEntity referencedOn OrderItemTable.productId
     var quantity by OrderItemTable.quantity
     var price by OrderItemTable.price
 
     fun toOrderItem() = OrderItem(
         id = id.value,
         orderId = orderId.value,
-        productId = productId.value,
+        productId = product.id.value,
         quantity = quantity,
         price = price
     )

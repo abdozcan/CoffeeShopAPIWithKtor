@@ -9,7 +9,7 @@ data class CartItem(
     @SerialName("cart_id")
     val cartId: Int,
     @SerialName("product_id")
-    val productId: Int,
+    val product: Product,
     val quantity: Int,
     val price: Double,
     @SerialName("discount_price")

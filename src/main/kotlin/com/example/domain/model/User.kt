@@ -12,7 +12,8 @@ data class User(
     val password: String,
     val email: String,
     val phone: String,
-    val address: String = "",
+    @SerialName("defaultAddress")
+    val defaultAddress: String = "",
     @SerialName("created_at")
     @Serializable(with = LocalDateTimeSerializer::class)
     val createdAt: LocalDateTime

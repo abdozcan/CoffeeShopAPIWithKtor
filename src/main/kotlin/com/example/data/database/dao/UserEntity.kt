@@ -1,6 +1,6 @@
 package com.example.data.database.dao
 
-import com.example.data.database.table.*
+import com.example.data.database.table.UserTable
 import com.example.domain.model.User
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
@@ -13,13 +13,8 @@ class UserEntity(id: EntityID<Int>) : IntEntity(id) {
     var password by UserTable.password
     var email by UserTable.email
     var phone by UserTable.phone
-    var address by UserTable.address
+    var defaultAddress by UserTable.defaultAddress
     var createdAt by UserTable.createdAt
-
-    val favorites by FavoriteEntity referrersOn FavoriteTable.userId
-    val orders by OrderEntity referrersOn OrderTable.userId
-    val reviews by ReviewEntity referrersOn ReviewTable.userId
-    val addresses by AddressEntity referrersOn AddressTable.userId
 
     fun toUser() = User(
         id = id.value,
@@ -27,7 +22,7 @@ class UserEntity(id: EntityID<Int>) : IntEntity(id) {
         password = password,
         email = email,
         phone = phone,
-        address = address,
+        defaultAddress = defaultAddress,
         createdAt = createdAt
     )
 }

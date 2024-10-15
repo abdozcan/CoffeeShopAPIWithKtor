@@ -1,21 +1,21 @@
 package com.example.data.repository
 
+import com.example.data.database.dao.CartItemEntity
 import com.example.data.database.dao.OrderEntity
 import com.example.data.database.dao.OrderItemEntity
 import com.example.data.database.dao.ProductEntity
+import com.example.data.database.table.CartItemTable
 import com.example.data.database.table.OrderItemTable
 import com.example.data.database.table.OrderTable
 import com.example.data.database.table.UserTable
-import com.example.data.utils.OrderStatus
-import com.example.data.utils.doOrThrowIfNull
-import com.example.data.utils.mapOrTrowIfEmpty
-import com.example.data.utils.withTransactionContext
+import com.example.data.utils.*
 import com.example.domain.model.Order
 import com.example.domain.repository.OrderRepository
 import com.example.domain.repository.ProductOfOrderItem
 import com.example.domain.repository.RequestOrderedProduct
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.with
+import org.jetbrains.exposed.sql.and
 import java.time.LocalDateTime
 
 class DefaultOrderRepository : OrderRepository {
@@ -79,6 +79,7 @@ class DefaultOrderRepository : OrderRepository {
                     this.quantity = product.quantity
                     this.price = product.price
                 }
+                setCartItemStatusCompleted(userId, product.id)
             }
 
             order.toOrder()
@@ -97,6 +98,14 @@ class DefaultOrderRepository : OrderRepository {
     override suspend fun delete(id: Int): Result<Unit> = runCatching {
         withTransactionContext {
             OrderEntity.findById(id).doOrThrowIfNull { it.delete() }
+        }
+    }
+
+    private fun setCartItemStatusCompleted(userId: Int, productId: Int) {
+        CartItemEntity.find {
+            (CartItemTable.userId eq userId) and (CartItemTable.productId eq productId)
+        }.firstOrNull().doOrThrowIfNull {
+            it.status = CartStatus.COMPLETED
         }
     }
 }

@@ -14,7 +14,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 import java.time.LocalDateTime
 
 class DefaultCartRepository : CartRepository {
-    override suspend fun findByUserId(userId: Int): Result<List<CartItem>> = runCatching {
+    override suspend fun findAllByUserId(userId: Int): Result<List<CartItem>> = runCatching {
         withTransactionContext {
             CartItemEntity.find {
                 CartItemTable.userId eq userId

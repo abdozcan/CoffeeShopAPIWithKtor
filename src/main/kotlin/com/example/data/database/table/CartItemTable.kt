@@ -1,9 +1,10 @@
 package com.example.data.database.table
 
 import org.jetbrains.exposed.dao.id.IntIdTable
+import org.jetbrains.exposed.sql.ReferenceOption
 
 object CartItemTable : IntIdTable("car_item") {
-    val cartId = reference("cart_id", foreign = CartTable)
+    val userId = reference("user_id", foreign = UserTable, onDelete = ReferenceOption.CASCADE)
     val productId = reference("product_id", foreign = ProductTable)
     val quantity = integer("quantity")
     val price = double("price")

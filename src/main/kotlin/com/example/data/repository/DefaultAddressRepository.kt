@@ -4,7 +4,6 @@ import com.example.data.database.dao.AddressEntity
 import com.example.data.database.table.AddressTable
 import com.example.data.database.table.UserTable
 import com.example.data.utils.doOrThrowIfNull
-import com.example.data.utils.mapOrTrowIfEmpty
 import com.example.data.utils.withTransactionContext
 import com.example.domain.model.Address
 import com.example.domain.repository.AddressRepository
@@ -15,7 +14,7 @@ class DefaultAddressRepository : AddressRepository {
         withTransactionContext {
             AddressEntity.find {
                 AddressTable.userId eq userId
-            }.mapOrTrowIfEmpty {
+            }.map {
                 it.toAddress()
             }
         }

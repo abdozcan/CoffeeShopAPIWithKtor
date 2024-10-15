@@ -5,7 +5,6 @@ import com.example.data.database.table.ProductTable
 import com.example.data.database.table.ReviewTable
 import com.example.data.database.table.UserTable
 import com.example.data.utils.doOrThrowIfNull
-import com.example.data.utils.mapOrTrowIfEmpty
 import com.example.data.utils.withTransactionContext
 import com.example.domain.model.Review
 import com.example.domain.repository.ReviewRepository
@@ -16,7 +15,7 @@ class DefaultReviewRepository : ReviewRepository {
         withTransactionContext {
             ReviewEntity.find {
                 ReviewTable.productId eq productId
-            }.mapOrTrowIfEmpty {
+            }.map {
                 it.toReview()
             }
         }

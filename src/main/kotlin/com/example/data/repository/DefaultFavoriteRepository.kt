@@ -5,7 +5,6 @@ import com.example.data.database.table.FavoriteTable
 import com.example.data.database.table.ProductTable
 import com.example.data.database.table.UserTable
 import com.example.data.utils.doOrThrowIfNull
-import com.example.data.utils.mapOrTrowIfEmpty
 import com.example.data.utils.withTransactionContext
 import com.example.domain.model.Favorite
 import com.example.domain.repository.FavoriteRepository
@@ -17,7 +16,7 @@ class DefaultFavoriteRepository : FavoriteRepository {
         withTransactionContext {
             FavoriteEntity.find {
                 FavoriteTable.userId eq userId
-            }.mapOrTrowIfEmpty {
+            }.map {
                 it.toFavorite()
             }
         }

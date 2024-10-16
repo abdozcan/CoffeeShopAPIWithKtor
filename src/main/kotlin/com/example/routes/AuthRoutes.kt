@@ -1,23 +1,45 @@
 package com.example.routes
 
 import com.example.auth.AuthManager
+import com.example.auth.model.Credential
+import com.example.auth.model.RefreshTokenRequest
+import com.example.auth.model.Tokens
 import com.example.domain.model.User
 import com.example.domain.repository.UserRepository
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 fun Application.authRoutes(repo: UserRepository, authManager: AuthManager) = routing {
+    refreshToken(authManager)
     login(repo, authManager)
     register(repo, authManager)
 }
 
-fun Route.refreshToken(authManager: AuthManager) = post("/refresh_token") {
-
+fun Route.refreshToken(authManager: AuthManager) = authenticate {
+    post("/refresh_token") {
+        runCatching {
+            call.receive<RefreshTokenRequest>()
+        }.onSuccess { refreshTokenRequest ->
+            authManager.verifyToken(token = refreshTokenRequest.refreshToken, type = "refresh")
+                .onSuccess {
+                    call.respond(
+                        HttpStatusCode.OK,
+                        Tokens(
+                            accessToken = authManager.createToken(email = refreshTokenRequest.email, type = "access"),
+                            refreshToken = authManager.createToken(email = refreshTokenRequest.email, type = "refresh")
+                        )
+                    )
+                }.onFailure {
+                    call.respond(HttpStatusCode.Unauthorized, "Invalid refresh token.")
+                }
+        }.onFailure {
+            call.respond(HttpStatusCode.BadRequest, "Invalid request body.")
+        }
+    }
 }
 
 fun Route.login(repo: UserRepository, authManager: AuthManager) = post("/login") {
@@ -64,17 +86,3 @@ fun Route.register(repo: UserRepository, authManager: AuthManager) = post("/regi
         call.respond(HttpStatusCode.BadRequest, "Invalid request body.")
     }
 }
-
-@Serializable
-data class Credential(
-    val email: String,
-    val password: String
-)
-
-@Serializable
-data class Tokens(
-    @SerialName("access_token")
-    val accessToken: String,
-    @SerialName("refresh_token")
-    val refreshToken: String
-)

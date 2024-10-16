@@ -6,6 +6,8 @@ import com.example.data.utils.doOrThrowIfNull
 import com.example.data.utils.withTransactionContext
 import com.example.domain.model.User
 import com.example.domain.repository.UserRepository
+import com.example.routes.Credential
+import org.jetbrains.exposed.sql.and
 
 class DefaultUserRepository : UserRepository {
     override suspend fun findByEmail(email: String): Result<User> = runCatching {
@@ -17,12 +19,26 @@ class DefaultUserRepository : UserRepository {
         }
     }
 
+    override suspend fun isEmailUsed(email: String): Boolean = withTransactionContext {
+        UserEntity.find { UserTable.email eq email }.none().not()
+    }
+
+    override suspend fun isPhoneUsed(phone: String): Boolean = withTransactionContext {
+        UserEntity.find { UserTable.phone eq phone }.none().not()
+    }
+
+    override suspend fun isIncorrectCredential(credential: Credential): Boolean = withTransactionContext {
+        UserEntity.find {
+            (UserTable.email eq credential.email) and (UserTable.password eq credential.password)
+        }.none()
+    }
+
     override suspend fun add(
         name: String,
         password: String,
         email: String,
         phone: String,
-        address: String
+        defaultAddress: String
     ): Result<User> = runCatching {
         withTransactionContext {
             UserEntity.new {
@@ -30,7 +46,7 @@ class DefaultUserRepository : UserRepository {
                 this.password = password
                 this.email = email
                 this.phone = phone
-                this.defaultAddress = address
+                this.defaultAddress = defaultAddress
             }.toUser()
         }
     }

@@ -11,7 +11,7 @@ import io.ktor.server.routing.*
 fun Application.productRoutes(repo: ProductRepository) = routing {
     getAll(repo)
     getById(repo)
-    getByCategoryId(repo)
+    getByCategory(repo)
     getBestseller(repo)
     getFavoriteByUserId(repo)
 }
@@ -49,7 +49,7 @@ fun Route.getById(repo: ProductRepository) = get("/products/{id}") {
     }
 }
 
-fun Route.getByCategoryId(repo: ProductRepository) = get("/products/{category}") {
+fun Route.getByCategory(repo: ProductRepository) = get("/products/{category}") {
     call.parameters["category"]?.let { category: String ->
         repo.findByCategory(category)
             .onSuccess { productList ->

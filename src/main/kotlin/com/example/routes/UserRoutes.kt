@@ -5,9 +5,9 @@ import io.ktor.server.application.*
 import io.ktor.server.routing.*
 
 fun Application.userRoutes(repo: UserRepository) = routing {
-    byEmail(repo)
-    address(repo)
+    getByEmail(repo)
+    getAddress(repo)
 }
 
-fun Route.byEmail(repo: UserRepository) = get("/users/{email}") { }
-fun Route.address(repo: UserRepository) = get("/users/{userId}/{addressId}") { }
+fun Route.getByEmail(repo: UserRepository) = get("/users/{email}") { }
+fun Route.getAddress(repo: UserRepository) = get("/users/{userId}/addresses/{addressId}") { }

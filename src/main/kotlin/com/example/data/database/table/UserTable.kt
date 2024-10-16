@@ -9,7 +9,7 @@ object UserTable : IntIdTable("users") {
     val name = varchar("name", 255)
     val password = varchar("password", 255)
     val email = varchar("email", 255).uniqueIndex()
-    val phone = varchar("phone", 20)
+    val phone = varchar("phone", 20).uniqueIndex()
     val defaultAddress =
         reference("default_address", refColumn = AddressTable.address, onDelete = ReferenceOption.CASCADE)
     val createdAt = datetime("created_at").defaultExpression(CurrentDateTime)

@@ -1,7 +1,7 @@
 package com.example.domain.repository
 
+import com.example.auth.model.Credential
 import com.example.domain.model.User
-import com.example.routes.Credential
 
 interface UserRepository {
     suspend fun findByEmail(email: String): Result<User>

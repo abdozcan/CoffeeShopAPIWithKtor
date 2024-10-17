@@ -1,12 +1,12 @@
 package com.example.data.repository
 
+import com.example.auth.model.Credential
 import com.example.data.database.dao.UserEntity
 import com.example.data.database.table.UserTable
 import com.example.data.utils.doOrThrowIfNull
 import com.example.data.utils.withTransactionContext
 import com.example.domain.model.User
 import com.example.domain.repository.UserRepository
-import com.example.routes.Credential
 import org.jetbrains.exposed.sql.and
 
 class DefaultUserRepository : UserRepository {

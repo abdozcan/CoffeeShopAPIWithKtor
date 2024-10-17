@@ -19,6 +19,8 @@ fun Application.userRoutes(userRepo: UserRepository, addressRepo: AddressReposit
         getByEmail(userRepo)
         getAddresses(addressRepo)
         setDefaultAddress(userRepo)
+        addAddress(addressRepo)
+        delete(userRepo)
     }
 }
 
@@ -130,8 +132,29 @@ fun Route.addAddress(addressRepo: AddressRepository) = post("/users/{userId}/add
     }
 }
 
+fun Route.delete(repo: UserRepository) = delete("/users/{id}") {
+    runCatching {
+        call.parameters["id"].doOrThrowIfNull { id -> id.toInt() }
+    }.onSuccess {
+        repo.delete(it)
+            .onSuccess {
+                call.respond(HttpStatusCode.OK, "User deleted successfully.")
+            }.onFailure { exception ->
+                when (exception) {
+                    is NotFoundException -> call.respond(HttpStatusCode.NotFound, "User not found.")
+                    else -> call.respond(HttpStatusCode.InternalServerError, "Internal Server Error.")
+                }
+            }
+    }.onFailure { exception ->
+        when (exception) {
+            is NumberFormatException -> call.respond(HttpStatusCode.BadRequest, "Invalid User ID.")
+            is NotFoundException -> call.respond(HttpStatusCode.NotFound, "User ID parameter is missing.")
+        }
+    }
+}
+
 @Serializable
-data class AddressRequest(
+private data class AddressRequest(
     val name: String,
     val address: String
 )

@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.example.auth.DefaultAuthManager
 import com.example.data.database.table.*
+import com.example.data.repository.DefaultAddressRepository
 import com.example.data.repository.DefaultProductRepository
 import com.example.data.repository.DefaultUserRepository
 import com.example.routes.authRoutes
@@ -33,7 +34,10 @@ fun Application.module() {
 
 private fun Application.configureRouting(audience: String, issuer: String, secret: String) {
     productRoutes(DefaultProductRepository())
-    userRoutes(DefaultUserRepository())
+    userRoutes(
+        DefaultUserRepository(),
+        DefaultAddressRepository()
+    )
     authRoutes(
         DefaultUserRepository(),
         DefaultAuthManager(audience, issuer, secret)

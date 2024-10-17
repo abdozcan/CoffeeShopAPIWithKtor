@@ -1,6 +1,7 @@
 package com.example.routes
 
 import com.example.data.utils.Constant.ADDRESS_LENGTH
+import com.example.data.utils.Constant.ADDRESS_NAME_LENGTH
 import com.example.data.utils.doOrThrowIfNull
 import com.example.domain.repository.AddressRepository
 import com.example.domain.repository.UserRepository
@@ -11,6 +12,7 @@ import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.Serializable
 
 fun Application.userRoutes(userRepo: UserRepository, addressRepo: AddressRepository) = routing {
     authenticate {
@@ -89,3 +91,47 @@ fun Route.setDefaultAddress(repo: UserRepository) = post("/users/{userId}/defaul
         }
     }
 }
+
+fun Route.addAddress(addressRepo: AddressRepository) = post("/users/{userId}/address/add") {
+    runCatching {
+        call.parameters["userId"].doOrThrowIfNull { userId -> userId.toInt() }
+    }.onSuccess { userId ->
+        runCatching {
+            call.receive<AddressRequest>().doOrThrowIfNull { addressRequest ->
+                if (addressRequest.name.length > ADDRESS_NAME_LENGTH)
+                    return@post call.respond(
+                        HttpStatusCode.BadRequest,
+                        "Address name length must be less than $ADDRESS_NAME_LENGTH."
+                    )
+
+                if (addressRequest.address.length > ADDRESS_LENGTH)
+                    return@post call.respond(
+                        HttpStatusCode.BadRequest,
+                        "Address length must be less than $ADDRESS_LENGTH."
+                    )
+
+                addressRequest
+            }
+        }.onSuccess { addressRequest ->
+            addressRepo.add(addressRequest.name, userId, addressRequest.address)
+                .onSuccess { address ->
+                    call.respond(HttpStatusCode.OK, address)
+                }.onFailure {
+                    call.respond(HttpStatusCode.InternalServerError, "Internal Server Error.")
+                }
+        }.onFailure {
+            call.respond(HttpStatusCode.BadRequest, "Invalid request body.")
+        }
+    }.onFailure { exception ->
+        when (exception) {
+            is NumberFormatException -> call.respond(HttpStatusCode.BadRequest, "Invalid User ID.")
+            is NotFoundException -> call.respond(HttpStatusCode.NotFound, "User ID parameter is missing.")
+        }
+    }
+}
+
+@Serializable
+data class AddressRequest(
+    val name: String,
+    val address: String
+)

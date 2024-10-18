@@ -6,7 +6,7 @@ import io.ktor.server.plugins.*
  * @throws NotFoundException
  */
 inline fun <T, R: Any> T?.doOrThrowIfNull(transform: (T) -> R): R {
-    return this?.let(transform) ?: throw NotFoundException("Not Found.")
+    return this?.let(transform) ?: throw NoSuchElementException("Not Found.")
 }
 
 /**

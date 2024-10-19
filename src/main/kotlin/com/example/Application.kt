@@ -98,7 +98,8 @@ private fun Application.configureDatabase() {
             SchemaUtils.create(
                 AddressTable, CategoryTable, FavoriteTable,
                 OrderItemTable, OrderTable, PaymentTable,
-                PromotionTable, ProductTable, ReviewTable, UserTable
+                PromotionTable, ProductTable, ReviewTable,
+                UserTable, CartItemTable
             )
         }
     }

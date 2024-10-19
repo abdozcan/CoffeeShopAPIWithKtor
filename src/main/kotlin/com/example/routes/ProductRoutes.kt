@@ -47,7 +47,7 @@ fun Route.getBestseller(repo: ProductRepository) = get("/products/bestseller") {
 fun Route.getFavoriteByUserId(repo: ProductRepository) = authenticate {
     get("/products/favorite/{userId?}") {
         call.parameters["userId"]?.toInt()?.let { userId ->
-            repo.findFavoritedProduct(userId).getOrThrow().let { productList ->
+            repo.findFavoriteProduct(userId).getOrThrow().let { productList ->
                     call.respond(productList)
                 }
         } ?: throw MissingRequestParameterException("user ID")

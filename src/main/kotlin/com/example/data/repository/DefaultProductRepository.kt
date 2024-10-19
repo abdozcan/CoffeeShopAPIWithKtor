@@ -5,7 +5,6 @@ import com.example.data.database.dao.ProductEntity
 import com.example.data.database.table.FavoriteTable
 import com.example.data.database.table.ProductTable
 import com.example.data.utils.doOrThrowIfNull
-import com.example.data.utils.flatMapOrTrowIfEmpty
 import com.example.data.utils.mapOrTrowIfEmpty
 import com.example.data.utils.withTransactionContext
 import com.example.domain.model.Product
@@ -50,13 +49,11 @@ class DefaultProductRepository : ProductRepository {
         }
     }
 
-    override suspend fun findFavoritedProduct(userId: Int): Result<List<Product>> = runCatching {
+    override suspend fun findFavoriteProduct(userId: Int): Result<List<Product>> = runCatching {
         withTransactionContext {
-            FavoriteEntity.find {
-                FavoriteTable.userId eq userId
-            }.flatMapOrTrowIfEmpty {
-                it.products.map {
-                    productEntity -> productEntity.toProduct()
+            FavoriteEntity.find { FavoriteTable.userId eq userId }.mapOrTrowIfEmpty { favoriteProduct ->
+                ProductEntity.findById(favoriteProduct.productId.value).doOrThrowIfNull { product ->
+                    product.toProduct()
                 }
             }
         }

@@ -2,6 +2,7 @@ package com.example
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import com.auth0.jwt.exceptions.*
 import com.example.auth.AuthManager
 import com.example.auth.DefaultAuthManager
 import com.example.data.database.table.*
@@ -46,13 +47,19 @@ private fun Application.configureStatusPages() = install(StatusPages) {
     exception<Throwable> { call, cause ->
         when (cause) {
             is NumberFormatException -> call.respond(HttpStatusCode.BadRequest, "Invalid parameter.")
-            is IllegalArgumentException -> call.respond(HttpStatusCode.BadRequest, cause.message.toString())
             is NoSuchElementException -> call.respond(HttpStatusCode.NotFound, "Data not found.")
-            is NullPointerException -> call.respond(HttpStatusCode.BadRequest, cause.message.toString())
             is NotFoundException -> call.respond(HttpStatusCode.NotFound, cause.message.toString())
-            is MissingRequestParameterException -> call.respond(HttpStatusCode.BadRequest, cause.message.toString())
-            is BadRequestException -> call.respond(HttpStatusCode.BadRequest, cause.message.toString())
-            is ContentTransformationException -> call.respond(HttpStatusCode.BadRequest, cause.message.toString())
+            is IllegalArgumentException,
+            is NullPointerException,
+            is MissingRequestParameterException,
+            is BadRequestException,
+            is ContentTransformationException,
+            is AlgorithmMismatchException,
+            is SignatureVerificationException,
+            is TokenExpiredException,
+            is MissingClaimException,
+            is IncorrectClaimException,
+            is JWTVerificationException -> call.respond(HttpStatusCode.BadRequest, cause.message.toString())
 
         }
     }

@@ -5,6 +5,7 @@ import com.example.data.database.table.FavoriteTable
 import com.example.data.database.table.ProductTable
 import com.example.data.database.table.UserTable
 import com.example.data.utils.doOrThrowIfNull
+import com.example.data.utils.mapOrTrowIfEmpty
 import com.example.data.utils.withTransactionContext
 import com.example.domain.model.Favorite
 import com.example.domain.repository.FavoriteRepository
@@ -12,38 +13,37 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.and
 
 class DefaultFavoriteRepository : FavoriteRepository {
-    override suspend fun finAllByUserId(userId: Int): Result<List<Favorite>> = runCatching {
+    override suspend fun findAllByUserId(userId: Int): Result<List<Favorite>> = runCatching {
         withTransactionContext {
             FavoriteEntity.find {
                 FavoriteTable.userId eq userId
-            }.map {
+            }.mapOrTrowIfEmpty {
                 it.toFavorite()
             }
         }
     }
 
-
-    override suspend fun isFavorite(userId: Int, productId: Int): Result<Int> = runCatching {
+    override suspend fun isFavorite(userId: Int, productId: Int): Result<Boolean> = runCatching {
         withTransactionContext {
             FavoriteEntity
                 .find {
                     (FavoriteTable.userId eq userId) and (FavoriteTable.productId eq productId)
-                }.single().id.value
+                }.none().not()
         }
     }
 
-    override suspend fun add(userId: Int, productId: Int): Result<Int> = runCatching {
+    override suspend fun add(userId: Int, productId: Int): Result<Unit> = runCatching {
         withTransactionContext {
             FavoriteEntity.new {
                 this.userId = EntityID(userId, UserTable)
                 this.productId = EntityID(productId, ProductTable)
-            }.id.value
+            }
         }
     }
 
-    override suspend fun delete(id: Int): Result<Unit> = runCatching {
+    override suspend fun delete(productId: Int): Result<Unit> = runCatching {
         withTransactionContext {
-            FavoriteEntity.findById(id).doOrThrowIfNull { it.delete() }
+            FavoriteEntity.find { FavoriteTable.productId eq productId }.firstOrNull().doOrThrowIfNull { it.delete() }
         }
     }
 }

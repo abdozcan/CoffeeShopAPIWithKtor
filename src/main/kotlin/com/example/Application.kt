@@ -6,18 +6,9 @@ import com.auth0.jwt.exceptions.*
 import com.example.auth.AuthManager
 import com.example.auth.DefaultAuthManager
 import com.example.data.database.table.*
-import com.example.data.repository.DefaultAddressRepository
-import com.example.data.repository.DefaultCartRepository
-import com.example.data.repository.DefaultProductRepository
-import com.example.data.repository.DefaultUserRepository
-import com.example.domain.repository.AddressRepository
-import com.example.domain.repository.CartRepository
-import com.example.domain.repository.ProductRepository
-import com.example.domain.repository.UserRepository
-import com.example.routes.authRoutes
-import com.example.routes.cartRoutes
-import com.example.routes.productRoutes
-import com.example.routes.userRoutes
+import com.example.data.repository.*
+import com.example.domain.repository.*
+import com.example.routes.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -74,17 +65,18 @@ private fun Application.configureRouting(audience: String, issuer: String, secre
     val addressRepo: AddressRepository = DefaultAddressRepository()
     val authManager: AuthManager = DefaultAuthManager(audience, issuer, secret)
     val cartRepo: CartRepository = DefaultCartRepository()
+    val favoriteRepo: FavoriteRepository = DefaultFavoriteRepository()
+    val reviewRepo: ReviewRepository = DefaultReviewRepository()
+    val orderRepo: OrderRepository = DefaultOrderRepository()
 
     productRoutes(productRepo)
-    userRoutes(
-        userRepo,
-        addressRepo
-    )
-    authRoutes(
-        userRepo,
-        authManager
-    )
+    userRoutes(userRepo)
+    authRoutes(userRepo, authManager)
     cartRoutes(cartRepo)
+    favoriteRoutes(favoriteRepo)
+    reviewRoutes(reviewRepo)
+    orderRoutes(orderRepo)
+    addressRoutes(addressRepo)
 }
 
 private fun Application.configureDatabase() {

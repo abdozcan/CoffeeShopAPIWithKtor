@@ -1,8 +1,7 @@
 package com.example.routes
 
-import com.example.data.utils.doOrThrowIfNull
+import com.example.domain.model.Product
 import com.example.domain.repository.ProductRepository
-import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.plugins.*
@@ -18,83 +17,39 @@ fun Application.productRoutes(repo: ProductRepository) = routing {
 }
 
 fun Route.getAll(repo: ProductRepository) = get("/products") {
-    repo.all()
-        .onSuccess { productList ->
+    repo.all().getOrThrow().let { productList ->
             call.respond(productList)
-        }.onFailure { exception ->
-            when (exception) {
-                is NoSuchElementException -> call.respond(HttpStatusCode.NotFound, "No products found.")
-                else -> call.respond(HttpStatusCode.InternalServerError, "Internal Server Error.")
-            }
         }
 }
 
-fun Route.getById(repo: ProductRepository) = get("/products/{id}") {
-    runCatching {
-        call.parameters["id"].doOrThrowIfNull { id -> id.toInt() }
-    }.onSuccess { id ->
-        repo.findById(id)
-            .onSuccess { product ->
+fun Route.getById(repo: ProductRepository) = get("/products/{id?}") {
+    call.parameters["id"]?.toInt()?.let { id ->
+        repo.findById(id).getOrThrow().let { product ->
                 call.respond(product)
-            }.onFailure { exception ->
-                when (exception) {
-                    is NoSuchElementException -> call.respond(HttpStatusCode.NotFound, "No product found.")
-                    else -> call.respond(HttpStatusCode.InternalServerError, "Internal Server Error.")
-                }
             }
-    }.onFailure { exception ->
-        when (exception) {
-            is NumberFormatException -> call.respond(HttpStatusCode.BadRequest, "Invalid ID.")
-            is NotFoundException -> call.respond(HttpStatusCode.NotFound, "ID parameter is missing.")
-        }
-    }
+    } ?: throw MissingRequestParameterException("ID")
 }
 
-fun Route.getByCategory(repo: ProductRepository) = get("/products/{category}") {
+fun Route.getByCategory(repo: ProductRepository) = get("/products/category/{category?}") {
     call.parameters["category"]?.let { category: String ->
-        repo.findByCategory(category)
-            .onSuccess { productList ->
-                call.respond(productList)
-            }.onFailure { exception ->
-                when (exception) {
-                    is NoSuchElementException -> call.respond(HttpStatusCode.NotFound, "No products found.")
-                    else -> call.respond(HttpStatusCode.InternalServerError, "Internal Server Error.")
-                }
-            }
-    } ?: call.respond(HttpStatusCode.BadRequest, "Category parameter is missing.")
+        repo.findByCategory(category).getOrThrow().let { products: List<Product> ->
+            call.respond(products)
+        }
+    } ?: throw MissingRequestParameterException("category name")
 }
 
 fun Route.getBestseller(repo: ProductRepository) = get("/products/bestseller") {
-    repo.findBestsellers()
-        .onSuccess { productList ->
+    repo.findBestsellers().getOrThrow().let { productList ->
             call.respond(productList)
-        }.onFailure { exception ->
-            when (exception) {
-                is NoSuchElementException -> call.respond(HttpStatusCode.NotFound, "No bestsellers found.")
-                else -> call.respond(HttpStatusCode.InternalServerError, "Internal Server Error.")
-            }
         }
 }
 
 fun Route.getFavoriteByUserId(repo: ProductRepository) = authenticate {
-    get("/products/favorite/{userId}") {
-        runCatching {
-            call.parameters["userId"].doOrThrowIfNull { userId -> userId.toInt() }
-        }.onSuccess { userId ->
-            repo.findFavoritedProduct(userId)
-                .onSuccess { productList ->
+    get("/products/favorite/{userId?}") {
+        call.parameters["userId"]?.toInt()?.let { userId ->
+            repo.findFavoritedProduct(userId).getOrThrow().let { productList ->
                     call.respond(productList)
-                }.onFailure { exception ->
-                    when (exception) {
-                        is NoSuchElementException -> call.respond(HttpStatusCode.NotFound, "No products found.")
-                        else -> call.respond(HttpStatusCode.InternalServerError, "Internal Server Error.")
-                    }
                 }
-        }.onFailure { exception ->
-            when (exception) {
-                is NumberFormatException -> call.respond(HttpStatusCode.BadRequest, "Invalid ID.")
-                is NotFoundException -> call.respond(HttpStatusCode.NotFound, "User ID parameter is missing.")
-            }
-        }
+        } ?: throw MissingRequestParameterException("user ID")
     }
 }

@@ -2,7 +2,6 @@ package com.example.routes
 
 import com.example.data.utils.Constant.ADDRESS_LENGTH
 import com.example.data.utils.Constant.ADDRESS_NAME_LENGTH
-import com.example.data.utils.doOrThrowIfNull
 import com.example.domain.repository.AddressRepository
 import com.example.domain.repository.UserRepository
 import io.ktor.http.*
@@ -24,133 +23,72 @@ fun Application.userRoutes(userRepo: UserRepository, addressRepo: AddressReposit
     }
 }
 
-fun Route.getByEmail(repo: UserRepository) = get("/users/{email}") {
+fun Route.getByEmail(repo: UserRepository) = get("/users/{email?}") {
     call.parameters["email"]?.let { email ->
-        repo.findByEmail(email)
-            .onSuccess { user ->
+        repo.findByEmail(email).getOrThrow().let { user ->
                 call.respond(HttpStatusCode.OK, user)
-            }.onFailure { exception ->
-                when (exception) {
-                    is NotFoundException -> call.respond(HttpStatusCode.NotFound, "User not found.")
-                    else -> call.respond(HttpStatusCode.InternalServerError, "Internal Server Error.")
-                }
-            }
-    } ?: call.respond(HttpStatusCode.BadRequest, "Email parameter is missing.")
+        }
+    } ?: throw MissingRequestParameterException("email")
 }
 
-fun Route.getAddresses(addressRepo: AddressRepository) = get("/users/{userId}/addresses") {
-    runCatching {
-        call.parameters["userID"].doOrThrowIfNull { userId -> userId.toInt() }
-    }.onSuccess { userId ->
-        addressRepo.findAllByUserId(userId)
-            .onSuccess { addressList ->
+fun Route.getAddresses(addressRepo: AddressRepository) = get("/users/{userId?}/addresses") {
+    call.parameters["userID"]?.toInt()?.let { userId ->
+        addressRepo.findAllByUserId(userId).getOrThrow().let { addressList ->
                 call.respond(HttpStatusCode.OK, addressList)
-            }.onFailure { exception ->
-                when (exception) {
-                    is NoSuchElementException -> call.respond(HttpStatusCode.NotFound, "No addresses found.")
-                    else -> call.respond(HttpStatusCode.InternalServerError, "Internal Server Error.")
-                }
             }
-    }.onFailure { exception ->
-        when (exception) {
-            is NumberFormatException -> call.respond(HttpStatusCode.BadRequest, "Invalid User ID.")
-            is NotFoundException -> call.respond(HttpStatusCode.NotFound, "User ID parameter is missing.")
-        }
-    }
+    } ?: throw MissingRequestParameterException("user ID")
 }
 
-fun Route.setDefaultAddress(repo: UserRepository) = post("/users/{userId}/default_address/set") {
-    runCatching {
-        call.parameters["userId"].doOrThrowIfNull { userId -> userId.toInt() }
-    }.onSuccess { userId ->
-        runCatching {
-            call.receiveText().doOrThrowIfNull { address ->
-                if (address.length > ADDRESS_LENGTH)
-                    return@post call.respond(
-                        HttpStatusCode.BadRequest,
-                        "Address length must be less than $ADDRESS_LENGTH."
-                    )
+fun Route.setDefaultAddress(repo: UserRepository) = post("/users/{userId?}/default_address/set") {
+    call.parameters["userId"]?.toInt()?.let { userId ->
+        call.receiveText().let { address ->
+            if (address.length > ADDRESS_LENGTH)
+                return@post call.respond(
+                    HttpStatusCode.BadRequest,
+                    "Address length must be less than $ADDRESS_LENGTH."
+                )
 
+            repo.selectDefaultAddress(
+                userId,
                 address
-            }
-        }.onSuccess { address ->
-            repo.selectDefaultAddress(userId, address)
-                .onSuccess { user ->
+            ).getOrThrow().let { user ->
                     call.respond(HttpStatusCode.OK, user)
-                }.onFailure { exception ->
-                    when (exception) {
-                        is NotFoundException -> call.respond(HttpStatusCode.NotFound, "Invalid User ID.")
-                        else -> call.respond(HttpStatusCode.InternalServerError, "Internal Server Error.")
-                    }
                 }
-        }.onFailure {
-            call.respond(HttpStatusCode.BadRequest, "Invalid request body.")
         }
-    }.onFailure { exception ->
-        when (exception) {
-            is NumberFormatException -> call.respond(HttpStatusCode.BadRequest, "Invalid User ID.")
-            is NotFoundException -> call.respond(HttpStatusCode.NotFound, "User ID parameter is missing.")
-        }
-    }
+    } ?: throw MissingRequestParameterException("user ID")
 }
 
-fun Route.addAddress(addressRepo: AddressRepository) = post("/users/{userId}/address/add") {
-    runCatching {
-        call.parameters["userId"].doOrThrowIfNull { userId -> userId.toInt() }
-    }.onSuccess { userId ->
-        runCatching {
-            call.receive<AddressRequest>().doOrThrowIfNull { addressRequest ->
-                if (addressRequest.name.length > ADDRESS_NAME_LENGTH)
-                    return@post call.respond(
-                        HttpStatusCode.BadRequest,
-                        "Address name length must be less than $ADDRESS_NAME_LENGTH."
-                    )
+fun Route.addAddress(addressRepo: AddressRepository) = post("/users/{userId?}/address/add") {
+    call.parameters["userId"]?.toInt()?.let { userId ->
+        call.receive<AddressRequest>().let { addressRequest ->
+            if (addressRequest.name.length > ADDRESS_NAME_LENGTH)
+                return@post call.respond(
+                    HttpStatusCode.BadRequest,
+                    "Address name length must be less than $ADDRESS_NAME_LENGTH."
+                )
 
-                if (addressRequest.address.length > ADDRESS_LENGTH)
-                    return@post call.respond(
-                        HttpStatusCode.BadRequest,
-                        "Address length must be less than $ADDRESS_LENGTH."
-                    )
+            if (addressRequest.address.length > ADDRESS_LENGTH)
+                return@post call.respond(
+                    HttpStatusCode.BadRequest,
+                    "Address length must be less than $ADDRESS_LENGTH."
+                )
 
-                addressRequest
-            }
-        }.onSuccess { addressRequest ->
-            addressRepo.add(addressRequest.name, userId, addressRequest.address)
-                .onSuccess { address ->
+            addressRepo.add(
+                addressRequest.name,
+                userId,
+                addressRequest.address
+            ).getOrThrow().let { address ->
                     call.respond(HttpStatusCode.OK, address)
-                }.onFailure {
-                    call.respond(HttpStatusCode.InternalServerError, "Internal Server Error.")
                 }
-        }.onFailure {
-            call.respond(HttpStatusCode.BadRequest, "Invalid request body.")
         }
-    }.onFailure { exception ->
-        when (exception) {
-            is NumberFormatException -> call.respond(HttpStatusCode.BadRequest, "Invalid User ID.")
-            is NotFoundException -> call.respond(HttpStatusCode.NotFound, "User ID parameter is missing.")
-        }
-    }
+    } ?: throw MissingRequestParameterException("user ID")
 }
 
-fun Route.delete(repo: UserRepository) = delete("/users/{id}") {
-    runCatching {
-        call.parameters["id"].doOrThrowIfNull { id -> id.toInt() }
-    }.onSuccess {
-        repo.delete(it)
-            .onSuccess {
-                call.respond(HttpStatusCode.OK, "User deleted successfully.")
-            }.onFailure { exception ->
-                when (exception) {
-                    is NotFoundException -> call.respond(HttpStatusCode.NotFound, "User not found.")
-                    else -> call.respond(HttpStatusCode.InternalServerError, "Internal Server Error.")
-                }
-            }
-    }.onFailure { exception ->
-        when (exception) {
-            is NumberFormatException -> call.respond(HttpStatusCode.BadRequest, "Invalid User ID.")
-            is NotFoundException -> call.respond(HttpStatusCode.NotFound, "User ID parameter is missing.")
-        }
-    }
+fun Route.delete(repo: UserRepository) = delete("/users/{id?}") {
+    call.parameters["id"]?.toInt()?.let { id ->
+        repo.delete(id).getOrThrow()
+        call.respond(HttpStatusCode.OK, "User deleted successfully.")
+    } ?: throw MissingRequestParameterException("ID")
 }
 
 @Serializable

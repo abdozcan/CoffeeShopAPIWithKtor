@@ -5,6 +5,7 @@ import com.example.data.database.table.ProductTable
 import com.example.data.database.table.ReviewTable
 import com.example.data.database.table.UserTable
 import com.example.data.utils.doOrThrowIfNull
+import com.example.data.utils.mapOrTrowIfEmpty
 import com.example.data.utils.withTransactionContext
 import com.example.domain.model.Review
 import com.example.domain.repository.ReviewRepository
@@ -15,7 +16,7 @@ class DefaultReviewRepository : ReviewRepository {
         withTransactionContext {
             ReviewEntity.find {
                 ReviewTable.productId eq productId
-            }.map {
+            }.mapOrTrowIfEmpty {
                 it.toReview()
             }
         }
@@ -25,13 +26,13 @@ class DefaultReviewRepository : ReviewRepository {
         withTransactionContext {
             ReviewEntity.find {
                 ReviewTable.userId eq userId
-            }.map {
+            }.mapOrTrowIfEmpty {
                 it.toReview()
             }
         }
     }
 
-    override suspend fun add(review: Review): Result<Review> = runCatching {
+    override suspend fun add(review: Review): Result<Unit> = runCatching {
         withTransactionContext {
             ReviewEntity.new {
                 this.productId = EntityID(review.productId, ProductTable)
@@ -40,6 +41,16 @@ class DefaultReviewRepository : ReviewRepository {
                 this.comment = review.comment
                 this.reviewDate = review.reviewDate
             }.toReview()
+        }
+    }
+
+    override suspend fun edit(review: Review): Result<Unit> = runCatching {
+        withTransactionContext {
+            ReviewEntity.findByIdAndUpdate(review.id) {
+                it.rating = review.rating
+                it.comment = review.comment
+                it.reviewDate = review.reviewDate
+            }
         }
     }
 

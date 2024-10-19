@@ -46,7 +46,10 @@ private fun Application.configureStatusPages() = install(StatusPages) {
             is NoSuchElementException -> call.respond(HttpStatusCode.NotFound, "Data not found.")
             is NullPointerException -> call.respond(HttpStatusCode.BadRequest, cause.message.toString())
             is NotFoundException -> call.respond(HttpStatusCode.NotFound, cause.message.toString())
-            else -> call.respond(HttpStatusCode.InternalServerError, cause.message.toString())
+            is MissingRequestParameterException -> call.respond(HttpStatusCode.BadRequest, cause.message.toString())
+            is BadRequestException -> call.respond(HttpStatusCode.BadRequest, cause.message.toString())
+            is ContentTransformationException -> call.respond(HttpStatusCode.BadRequest, cause.message.toString())
+
         }
     }
 }

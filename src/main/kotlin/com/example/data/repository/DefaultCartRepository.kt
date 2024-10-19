@@ -7,10 +7,12 @@ import com.example.data.database.table.UserTable
 import com.example.data.utils.CartStatus
 import com.example.data.utils.Constant.CART_ITEM_EXPIRATION_HOURS
 import com.example.data.utils.doOrThrowIfNull
+import com.example.data.utils.mapOrTrowIfEmpty
 import com.example.data.utils.withTransactionContext
 import com.example.domain.model.CartItem
 import com.example.domain.repository.CartRepository
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.and
 import java.time.LocalDateTime
 
 class DefaultCartRepository : CartRepository {
@@ -18,7 +20,7 @@ class DefaultCartRepository : CartRepository {
         withTransactionContext {
             CartItemEntity.find {
                 CartItemTable.userId eq userId
-            }.map {
+            }.mapOrTrowIfEmpty {
                 it.toCartItem()
             }
         }
@@ -26,7 +28,12 @@ class DefaultCartRepository : CartRepository {
 
     override suspend fun add(userId: Int, productId: Int, quantity: Int): Result<Unit> = runCatching {
         withTransactionContext {
-            CartItemEntity.new {
+            CartItemEntity.find {
+                (CartItemTable.userId eq userId) and (CartItemTable.productId eq productId)
+            }.firstOrNull()?.let {
+                it.quantity += quantity
+                return@withTransactionContext
+            } ?: CartItemEntity.new {
                 this.userId = EntityID(userId, UserTable)
                 this.product = ProductEntity.findById(productId).doOrThrowIfNull { it }
                 this.quantity = quantity
@@ -41,7 +48,7 @@ class DefaultCartRepository : CartRepository {
 
     override suspend fun delete(ids: List<Int>): Result<Unit> = runCatching {
         withTransactionContext {
-            CartItemEntity.forIds(ids).map { it.delete() }
+            CartItemEntity.forIds(ids).mapOrTrowIfEmpty { it.delete() }
         }
     }
 }

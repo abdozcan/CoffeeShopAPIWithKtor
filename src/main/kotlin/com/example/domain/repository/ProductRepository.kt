@@ -12,5 +12,5 @@ interface ProductRepository {
      */
     suspend fun findByCategory(category: String): Result<List<Product>>
     suspend fun findBestsellers(): Result<List<Product>>
-    suspend fun findFavoritedProduct(userId: Int): Result<List<Product>>
+    suspend fun findFavoriteProduct(userId: Int): Result<List<Product>>
 }

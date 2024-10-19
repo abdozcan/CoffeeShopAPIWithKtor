@@ -9,6 +9,5 @@ data class Favorite(
     @SerialName("user_id")
     val userId: Int,
     @SerialName("product_id")
-    val productId: Int,
-    val products: List<Product>
+    val productId: Int
 )

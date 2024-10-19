@@ -5,7 +5,7 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.javatime.datetime
 
-object CartItemTable : IntIdTable("car_item") {
+object CartItemTable : IntIdTable("cart_item") {
     val userId = reference("user_id", foreign = UserTable, onDelete = ReferenceOption.CASCADE)
     val productId = reference("product_id", foreign = ProductTable)
     val quantity = integer("quantity")

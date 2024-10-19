@@ -7,12 +7,15 @@ import com.example.auth.AuthManager
 import com.example.auth.DefaultAuthManager
 import com.example.data.database.table.*
 import com.example.data.repository.DefaultAddressRepository
+import com.example.data.repository.DefaultCartRepository
 import com.example.data.repository.DefaultProductRepository
 import com.example.data.repository.DefaultUserRepository
 import com.example.domain.repository.AddressRepository
+import com.example.domain.repository.CartRepository
 import com.example.domain.repository.ProductRepository
 import com.example.domain.repository.UserRepository
 import com.example.routes.authRoutes
+import com.example.routes.cartRoutes
 import com.example.routes.productRoutes
 import com.example.routes.userRoutes
 import io.ktor.http.*
@@ -70,6 +73,7 @@ private fun Application.configureRouting(audience: String, issuer: String, secre
     val userRepo: UserRepository = DefaultUserRepository()
     val addressRepo: AddressRepository = DefaultAddressRepository()
     val authManager: AuthManager = DefaultAuthManager(audience, issuer, secret)
+    val cartRepo: CartRepository = DefaultCartRepository()
 
     productRoutes(productRepo)
     userRoutes(
@@ -80,6 +84,7 @@ private fun Application.configureRouting(audience: String, issuer: String, secre
         userRepo,
         authManager
     )
+    cartRoutes(cartRepo)
 }
 
 private fun Application.configureDatabase() {

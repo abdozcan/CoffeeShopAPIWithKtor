@@ -38,7 +38,7 @@ class DefaultUserRepository : UserRepository {
         password: String,
         email: String,
         phone: String,
-        defaultAddress: String
+        defaultAddress: String?
     ): Result<User> = runCatching {
         withTransactionContext {
             UserEntity.new {

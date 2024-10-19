@@ -13,7 +13,7 @@ class UserEntity(id: EntityID<Int>) : IntEntity(id) {
     var password by UserTable.password
     var email by UserTable.email
     var phone by UserTable.phone
-    var defaultAddress by UserTable.defaultAddress
+    var defaultAddress: String? by UserTable.defaultAddress
     var createdAt by UserTable.createdAt
 
     fun toUser() = User(

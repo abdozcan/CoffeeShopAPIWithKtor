@@ -12,7 +12,7 @@ object ProductTable : IntIdTable("products") {
     val flavorProfile = text("flavor_profile")
     val grindOption = text("grind_option")
     val roastLevel = integer("roast_level")
-    val imageUrl = text("image_url").uniqueIndex()
+    val imageUrl = text("image_url")
     val category = reference("category", refColumn = CategoryTable.name, onDelete = ReferenceOption.CASCADE)
     val stockQuantity = integer("stock_quantity")
     val popularityRating = float("popularity_rating")

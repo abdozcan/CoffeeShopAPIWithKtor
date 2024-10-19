@@ -2,11 +2,15 @@ package com.example
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import com.example.auth.AuthManager
 import com.example.auth.DefaultAuthManager
 import com.example.data.database.table.*
 import com.example.data.repository.DefaultAddressRepository
 import com.example.data.repository.DefaultProductRepository
 import com.example.data.repository.DefaultUserRepository
+import com.example.domain.repository.AddressRepository
+import com.example.domain.repository.ProductRepository
+import com.example.domain.repository.UserRepository
 import com.example.routes.authRoutes
 import com.example.routes.productRoutes
 import com.example.routes.userRoutes
@@ -55,14 +59,19 @@ private fun Application.configureStatusPages() = install(StatusPages) {
 }
 
 private fun Application.configureRouting(audience: String, issuer: String, secret: String) {
-    productRoutes(DefaultProductRepository())
+    val productRepo: ProductRepository = DefaultProductRepository()
+    val userRepo: UserRepository = DefaultUserRepository()
+    val addressRepo: AddressRepository = DefaultAddressRepository()
+    val authManager: AuthManager = DefaultAuthManager(audience, issuer, secret)
+
+    productRoutes(productRepo)
     userRoutes(
-        DefaultUserRepository(),
-        DefaultAddressRepository()
+        userRepo,
+        addressRepo
     )
     authRoutes(
-        DefaultUserRepository(),
-        DefaultAuthManager(audience, issuer, secret)
+        userRepo,
+        authManager
     )
 }
 

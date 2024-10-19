@@ -8,6 +8,8 @@ import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 fun Application.cartRoutes(cartRepo: CartRepository) = routing {
     authenticate {
@@ -38,12 +40,21 @@ private fun Route.delete(repo: CartRepository) = delete("/cart/delete") {
             return@delete call.respond(HttpStatusCode.BadRequest, "No ID found.")
 
         repo.delete(ids).getOrThrow()
-        call.respond(HttpStatusCode.OK, if (ids.size == 1) "Cart" else "Carts" + " deleted successfully.")
+        call.respond(
+            HttpStatusCode.OK, if (ids.size == 1) {
+                "Cart"
+            } else {
+                "Carts"
+            } + " deleted successfully."
+        )
     }
 }
 
+@Serializable
 data class CartItemRequest(
+    @SerialName("user_id")
     val userId: Int,
+    @SerialName("product_id")
     val productId: Int,
     val quantity: Int
 )

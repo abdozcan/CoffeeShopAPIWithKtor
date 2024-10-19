@@ -25,17 +25,14 @@ class DefaultAuthManager(
     }
 
     override fun verifyToken(
-        token: String?,
+        token: String,
+        email: String,
         type: String
     ): Result<Unit> = runCatching {
-        token ?: throw NullPointerException("Token is null.")
-        val tokenType = JWT.require(Algorithm.HMAC256(secret))
+        JWT.require(Algorithm.HMAC256(secret))
+            .withClaim("email", email)
+            .withClaim("type", type)
             .build()
             .verify(token)
-            .getClaim("type")
-            .asString()
-        if (type == tokenType) {
-            return Result.success(Unit)
-        } else throw IllegalArgumentException("Invalid token type.")
     }
 }

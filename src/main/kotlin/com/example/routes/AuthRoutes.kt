@@ -24,6 +24,7 @@ fun Route.refreshToken(authManager: AuthManager) = authenticate {
         call.receive<RefreshTokenRequest>().let { refreshTokenRequest ->
             authManager.verifyToken(
                 token = refreshTokenRequest.refreshToken,
+                email = refreshTokenRequest.email,
                 type = "refresh"
             ).getOrThrow()
             call.respond(

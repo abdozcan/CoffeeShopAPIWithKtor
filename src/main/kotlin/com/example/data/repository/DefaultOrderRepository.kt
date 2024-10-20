@@ -23,7 +23,7 @@ class DefaultOrderRepository : OrderRepository {
         withTransactionContext {
             OrderEntity.find {
                 OrderTable.userId eq userId
-            }.map {
+            }.mapOrTrowIfEmpty {
                 it.toOrder()
             }
         }

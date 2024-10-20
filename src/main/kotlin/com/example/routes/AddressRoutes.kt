@@ -59,7 +59,7 @@ private fun Route.delete(repo: AddressRepository) = delete("address/delete/{id?}
     } ?: throw MissingRequestParameterException("ID")
 }
 
-private fun Route.edit(repo: AddressRepository) = put("order/edit") {
+private fun Route.edit(repo: AddressRepository) = put("address/edit") {
     call.receive<Address>().let { address ->
         repo.edit(address).getOrThrow().let {
             call.respond("Address edited successfully.")

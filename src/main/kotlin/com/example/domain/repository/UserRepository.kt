@@ -5,6 +5,7 @@ import com.example.domain.model.User
 
 interface UserRepository {
     suspend fun findByEmail(email: String): Result<User>
+    suspend fun findById(id: Int): Result<User>
     suspend fun isEmailUsed(email: String): Boolean
     suspend fun isPhoneUsed(phone: String): Boolean
     suspend fun isIncorrectCredential(credential: Credential): Boolean

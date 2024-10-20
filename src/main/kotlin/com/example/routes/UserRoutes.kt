@@ -14,17 +14,26 @@ import kotlinx.serialization.Serializable
 fun Application.userRoutes(userRepo: UserRepository) = routing {
     authenticate {
         getByEmail(userRepo)
+        getById(userRepo)
         setDefaultAddress(userRepo)
         delete(userRepo)
     }
 }
 
-fun Route.getByEmail(repo: UserRepository) = get("/users/{email?}") {
-    call.parameters["email"]?.let { email ->
+fun Route.getByEmail(repo: UserRepository) = get("/user/by-email") {
+    call.receive<String>().let { email ->
         repo.findByEmail(email).getOrThrow().let { user ->
                 call.respond(HttpStatusCode.OK, user)
         }
-    } ?: throw MissingRequestParameterException("email")
+    }
+}
+
+fun Route.getById(repo: UserRepository) = get("/user/{id?}") {
+    call.parameters["id"]?.toInt()?.let { id ->
+        repo.findById(id).getOrThrow().let { user ->
+            call.respond(HttpStatusCode.OK, user)
+        }
+    } ?: throw MissingRequestParameterException("ID")
 }
 
 fun Route.setDefaultAddress(repo: UserRepository) = post("/user/{userId?}/default-address") {
@@ -43,7 +52,7 @@ fun Route.setDefaultAddress(repo: UserRepository) = post("/user/{userId?}/defaul
     } ?: throw MissingRequestParameterException("user ID")
 }
 
-fun Route.delete(repo: UserRepository) = delete("/users/{id?}") {
+fun Route.delete(repo: UserRepository) = delete("/user/{id?}") {
     call.parameters["id"]?.toInt()?.let { id ->
         repo.delete(id).getOrThrow()
         call.respond(HttpStatusCode.OK, "User deleted successfully.")

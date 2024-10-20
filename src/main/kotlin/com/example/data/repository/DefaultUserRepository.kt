@@ -19,6 +19,12 @@ class DefaultUserRepository : UserRepository {
         }
     }
 
+    override suspend fun findById(id: Int): Result<User> = runCatching {
+        withTransactionContext {
+            UserEntity.findById(id).doOrThrowIfNull { it.toUser() }
+        }
+    }
+
     override suspend fun isEmailUsed(email: String): Boolean = withTransactionContext {
         UserEntity.find { UserTable.email eq email }.none().not()
     }

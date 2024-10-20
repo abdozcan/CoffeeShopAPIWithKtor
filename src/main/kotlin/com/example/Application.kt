@@ -20,6 +20,7 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import kotlinx.coroutines.launch
+import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -53,7 +54,10 @@ private fun Application.configureStatusPages() = install(StatusPages) {
             is TokenExpiredException,
             is MissingClaimException,
             is IncorrectClaimException,
+            is ExposedSQLException,
             is JWTVerificationException -> call.respond(HttpStatusCode.BadRequest, cause.message.toString())
+
+            else -> call.respond(HttpStatusCode.InternalServerError, "Something went wrong.")
 
         }
     }

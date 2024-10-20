@@ -4,9 +4,9 @@ import com.example.data.utils.OrderStatus
 import com.example.domain.utils.LocalDateTimeSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.math.BigDecimal
 import java.time.LocalDateTime
 
+@Serializable
 data class Order(
     val id: Int,
     @SerialName("user_id")

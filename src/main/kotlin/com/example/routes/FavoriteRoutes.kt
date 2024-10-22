@@ -39,7 +39,7 @@ private fun Route.isFavorite(repo: FavoriteRepository) = post("/favorite/is-favo
 private fun Route.add(repo: FavoriteRepository) = post("/favorite/add") {
     call.receive<FavoriteItem>().let { item ->
         repo.add(item.userId, item.productId).getOrThrow()
-        call.respond(HttpStatusCode.OK, "Added to cart.")
+        call.respond(HttpStatusCode.OK, "Added to favorite.")
     }
 }
 

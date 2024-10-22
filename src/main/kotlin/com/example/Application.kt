@@ -87,15 +87,23 @@ private fun Application.configureDatabase() {
     launch {
         transaction(
             Database.connect(
-                "jdbc:sqlite:./data/coffee_shop_api.db",
+                "jdbc:sqlite:./data/coffee_shop_api.db" +
+                        "?foreign_keys=on",
                 "org.sqlite.JDBC"
             )
         ) {
             SchemaUtils.create(
-                AddressTable, CategoryTable, FavoriteTable,
-                OrderItemTable, OrderTable, PaymentTable,
-                PromotionTable, ProductTable, ReviewTable,
-                UserTable, CartItemTable
+                CategoryTable,
+                ProductTable,
+                UserTable,
+                AddressTable,
+                FavoriteTable,
+                ReviewTable,
+                CartItemTable,
+                OrderTable,
+                OrderItemTable,
+                PaymentTable,
+                PromotionTable
             )
         }
     }

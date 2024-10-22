@@ -7,7 +7,7 @@ import org.jetbrains.exposed.sql.javatime.datetime
 
 object ReviewTable : IntIdTable("reviews") {
     val productId = reference("product_id", foreign = ProductTable, onDelete = ReferenceOption.CASCADE)
-    val userId = reference("user_id", foreign = UserTable)
+    val userId = reference("user_id", foreign = UserTable, onDelete = ReferenceOption.SET_NULL).nullable()
     val rating = integer("rating")
     val comment = varchar("comment", COMMENT_LENGTH)
     val reviewDate = datetime("review_date")

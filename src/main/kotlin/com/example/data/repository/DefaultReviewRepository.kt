@@ -36,7 +36,7 @@ class DefaultReviewRepository : ReviewRepository {
         withTransactionContext {
             ReviewEntity.new {
                 this.productId = EntityID(review.productId, ProductTable)
-                this.userId = EntityID(review.userId, UserTable)
+                this.userId = EntityID(review.userId!!, UserTable)
                 this.rating = review.rating
                 this.comment = review.comment
                 this.reviewDate = review.reviewDate

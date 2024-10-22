@@ -18,7 +18,7 @@ class ReviewEntity(id: EntityID<Int>) : IntEntity(id) {
     fun toReview() = Review(
         id = id.value,
         productId = productId.value,
-        userId = userId.value,
+        userId = userId?.value,
         rating = rating,
         comment = comment,
         reviewDate = reviewDate

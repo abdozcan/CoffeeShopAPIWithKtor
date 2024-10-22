@@ -23,7 +23,7 @@ class OrderEntity(id: EntityID<Int>) : IntEntity(id) {
 
     fun toOrder() = Order(
         id = id.value,
-        userId = userId.value,
+        userId = userId?.value,
         orderDate = orderDate,
         status = status,
         totalAmount = totalAmount,

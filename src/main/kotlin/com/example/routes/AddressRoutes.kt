@@ -2,6 +2,7 @@ package com.example.routes
 
 import com.example.data.utils.Constant.ADDRESS_LENGTH
 import com.example.data.utils.Constant.ADDRESS_NAME_LENGTH
+import com.example.domain.model.AddAddressRequest
 import com.example.domain.model.Address
 import com.example.domain.repository.AddressRepository
 import io.ktor.http.*
@@ -11,8 +12,6 @@ import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 fun Application.addressRoutes(addressRepo: AddressRepository) = routing {
     authentication {
@@ -66,11 +65,3 @@ private fun Route.edit(repo: AddressRepository) = put("address/edit") {
         }
     }
 }
-
-@Serializable
-data class AddAddressRequest(
-    val name: String,
-    @SerialName("user_id")
-    val userId: Int,
-    val address: String
-)

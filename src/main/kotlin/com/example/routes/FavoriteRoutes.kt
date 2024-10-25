@@ -1,5 +1,6 @@
 package com.example.routes
 
+import com.example.domain.model.FavoriteItem
 import com.example.domain.repository.FavoriteRepository
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -8,8 +9,6 @@ import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 fun Application.favoriteRoutes(favoriteRepo: FavoriteRepository) = routing {
     authenticate {
@@ -49,11 +48,3 @@ private fun Route.delete(repo: FavoriteRepository) = delete("/favorite/delete/{p
         call.respond(HttpStatusCode.OK, "Favorite deleted successfully.")
     } ?: throw MissingRequestParameterException("product ID")
 }
-
-@Serializable
-data class FavoriteItem(
-    @SerialName("user_id")
-    val userId: Int,
-    @SerialName("product_id")
-    val productId: Int
-)

@@ -9,7 +9,6 @@ import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.Serializable
 
 fun Application.userRoutes(userRepo: UserRepository) = routing {
     authenticate {
@@ -58,9 +57,3 @@ fun Route.delete(repo: UserRepository) = delete("/user/{id?}") {
         call.respond(HttpStatusCode.OK, "User deleted successfully.")
     } ?: throw MissingRequestParameterException("ID")
 }
-
-@Serializable
-data class AddressRequest(
-    val name: String,
-    val address: String
-)

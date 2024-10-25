@@ -75,7 +75,9 @@ class DefaultOrderRepository : OrderRepository {
             orderedProducts.forEach { product ->
                 OrderItemEntity.new {
                     this.orderId = order.id
-                    this.product = ProductEntity.findById(product.id).doOrThrowIfNull { it }
+                    this.product = ProductEntity.findByIdAndUpdate(product.id) {
+                        it.stockQuantity -= product.quantity
+                    }.doOrThrowIfNull { it }
                     this.quantity = product.quantity
                     this.price = product.price
                 }
@@ -91,6 +93,12 @@ class DefaultOrderRepository : OrderRepository {
             OrderEntity.findByIdAndUpdate(orderId) {
                 it.status = OrderStatus.CANCELLED
                 it.updatedAt = LocalDateTime.now()
+            }?.let { order ->
+                order.orderItems.forEach { orderItem ->
+                    ProductEntity.findByIdAndUpdate(orderItem.product.id.value) {
+                        it.stockQuantity += orderItem.quantity
+                    }
+                }
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.example.routes
 
+import com.example.domain.model.CartItemRequest
 import com.example.domain.repository.CartRepository
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -8,8 +9,6 @@ import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 fun Application.cartRoutes(cartRepo: CartRepository) = routing {
     authenticate {
@@ -49,12 +48,3 @@ private fun Route.delete(repo: CartRepository) = delete("/cart/delete") {
         )
     }
 }
-
-@Serializable
-data class CartItemRequest(
-    @SerialName("user_id")
-    val userId: Int,
-    @SerialName("product_id")
-    val productId: Int,
-    val quantity: Int
-)

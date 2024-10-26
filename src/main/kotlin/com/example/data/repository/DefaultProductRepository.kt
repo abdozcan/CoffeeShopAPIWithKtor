@@ -4,7 +4,6 @@ import com.example.data.database.dao.FavoriteEntity
 import com.example.data.database.dao.ProductEntity
 import com.example.data.database.table.FavoriteTable
 import com.example.data.database.table.ProductTable
-import com.example.data.database.table.ProductTable.category
 import com.example.data.utils.doOrThrowIfNull
 import com.example.data.utils.mapOrTrowIfEmpty
 import com.example.data.utils.withTransactionContext
@@ -70,7 +69,7 @@ class DefaultProductRepository : ProductRepository {
         withTransactionContext {
             ProductEntity.find {
                 val op = if (request.category != null)
-                    (ProductTable.name like "%${request.name}%") and (ProductTable.category eq category)
+                    (ProductTable.name like "%${request.name}%") and (ProductTable.category eq request.category)
                 else (ProductTable.name like "%${request.name}%")
 
                 op.and(ProductTable.price greaterEq request.minPrice)

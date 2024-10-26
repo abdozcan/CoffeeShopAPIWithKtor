@@ -3,6 +3,7 @@ package com.example.routes
 import com.example.domain.model.Product
 import com.example.domain.model.SearchRequest
 import com.example.domain.repository.ProductRepository
+import com.example.routes.utils.by
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.plugins.*
@@ -11,53 +12,61 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
 fun Application.productRoutes(repo: ProductRepository) = routing {
-    getAll(repo)
-    getById(repo)
-    getByCategory(repo)
-    getBestseller(repo)
-    getFavoriteByUserId(repo)
-    search(repo)
-}
-
-fun Route.getAll(repo: ProductRepository) = get("/products") {
-    repo.all().getOrThrow().let { productList ->
-        call.respond(productList)
+    route("/product") {
+        getAll(repo)
+        getById(repo)
+        getByCategory(repo)
+        getBestseller(repo)
+        getFavoriteByUserId(repo)
+        search(repo)
     }
 }
 
-fun Route.getById(repo: ProductRepository) = get("/products/{id?}") {
-    call.parameters["id"]?.toInt()?.let { id ->
-        repo.findById(id).getOrThrow().let { product ->
-            call.respond(product)
+fun Route.getAll(repo: ProductRepository) = get {
+    by { limit, offset ->
+        repo.all(limit, offset).getOrThrow().let { productList ->
+            call.respond(productList)
         }
-    } ?: throw MissingRequestParameterException("ID")
+    }
 }
 
-fun Route.getByCategory(repo: ProductRepository) = get("/products/category/{category?}") {
+fun Route.getById(repo: ProductRepository) {
+    by { id, limit, offset ->
+        repo.findById(id, limit, offset).getOrThrow().let { product ->
+            call.respond(product)
+        }
+    }
+}
+
+fun Route.getByCategory(repo: ProductRepository) = get("/category/{category?}") {
     call.parameters["category"]?.let { category: String ->
-        repo.findByCategory(category).getOrThrow().let { products: List<Product> ->
-            call.respond(products)
+        by { limit, offset ->
+            repo.findByCategory(category, limit, offset).getOrThrow().let { products: List<Product> ->
+                call.respond(products)
+            }
         }
     } ?: throw MissingRequestParameterException("category name")
 }
 
-fun Route.getBestseller(repo: ProductRepository) = get("/products/bestseller") {
-    repo.findBestsellers().getOrThrow().let { productList ->
-        call.respond(productList)
+fun Route.getBestseller(repo: ProductRepository) = get("/bestseller") {
+    by { limit, offset ->
+        repo.findBestsellers(limit, offset).getOrThrow().let { productList ->
+            call.respond(productList)
+        }
     }
 }
 
 fun Route.getFavoriteByUserId(repo: ProductRepository) = authenticate {
-    get("/products/favorite/{userId?}") {
-        call.parameters["userId"]?.toInt()?.let { userId ->
-            repo.findFavoriteProduct(userId).getOrThrow().let { productList ->
+    get("/favorite") {
+        by { id, limit, offset ->
+            repo.findFavoriteProduct(id, limit, offset).getOrThrow().let { productList ->
                 call.respond(productList)
             }
-        } ?: throw MissingRequestParameterException("user ID")
+        }
     }
 }
 
-fun Route.search(repo: ProductRepository) = post("/products/search") {
+fun Route.search(repo: ProductRepository) = post("/search") {
     call.receive<SearchRequest>().let { request ->
         repo.search(request).getOrThrow().let { productList ->
             call.respond(productList)

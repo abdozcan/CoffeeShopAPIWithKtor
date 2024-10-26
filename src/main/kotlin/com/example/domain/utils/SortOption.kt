@@ -1,8 +1,5 @@
 package com.example.domain.utils
 
-enum class SortOption(val value: String) {
-    PRICE_ASC("price_asc"),
-    PRICE_DESC("price_desc"),
-    POPULARITY("popularity"),
-    DATE("date")
+interface SortOption {
+    val value: String
 }

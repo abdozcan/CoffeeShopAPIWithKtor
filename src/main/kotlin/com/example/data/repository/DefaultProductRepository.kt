@@ -16,47 +16,44 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.coalesce
 import org.jetbrains.exposed.sql.and
 
 class DefaultProductRepository : ProductRepository {
-    override suspend fun all(): Result<List<Product>> = runCatching {
+    override suspend fun all(limit: Int, offset: Long): Result<List<Product>> = runCatching {
         withTransactionContext {
-            ProductEntity.all().mapOrTrowIfEmpty { it.toProduct() }
+            ProductEntity.all().limit(limit, offset).mapOrTrowIfEmpty { it.toProduct() }
         }
     }
 
-    /**
-     * @throws NotFoundException
-     */
-    override suspend fun findById(id: Int): Result<Product> = runCatching {
+    override suspend fun findById(id: Int, limit: Int, offset: Long): Result<Product> = runCatching {
         withTransactionContext {
             ProductEntity.findById(id).doOrThrowIfNull { it.toProduct() }
         }
     }
 
-    /**
-     * @throws NoSuchElementException
-     */
-    override suspend fun findByCategory(category: String): Result<List<Product>> = runCatching {
+    override suspend fun findByCategory(category: String, limit: Int, offset: Long): Result<List<Product>> =
+        runCatching {
         withTransactionContext {
             ProductEntity.find {
                 ProductTable.category eq category
-            }.mapOrTrowIfEmpty {
+            }.limit(limit, offset).mapOrTrowIfEmpty {
                 it.toProduct()
             }
         }
     }
 
-    override suspend fun findBestsellers(): Result<List<Product>> = runCatching {
+    override suspend fun findBestsellers(limit: Int, offset: Long): Result<List<Product>> = runCatching {
         withTransactionContext {
             ProductEntity.find {
                 ProductTable.bestseller eq true
-            }.mapOrTrowIfEmpty {
+            }.limit(limit, offset).mapOrTrowIfEmpty {
                 it.toProduct()
             }
         }
     }
 
-    override suspend fun findFavoriteProduct(userId: Int): Result<List<Product>> = runCatching {
+    override suspend fun findFavoriteProduct(userId: Int, limit: Int, offset: Long): Result<List<Product>> =
+        runCatching {
         withTransactionContext {
-            FavoriteEntity.find { FavoriteTable.userId eq userId }.mapOrTrowIfEmpty { favoriteProduct ->
+            FavoriteEntity.find { FavoriteTable.userId eq userId }.limit(limit, offset)
+                .mapOrTrowIfEmpty { favoriteProduct ->
                 ProductEntity.findById(favoriteProduct.productId.value).doOrThrowIfNull { product ->
                     product.toProduct()
                 }

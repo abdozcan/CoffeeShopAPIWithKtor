@@ -12,6 +12,7 @@ import com.example.domain.model.SearchRequest
 import com.example.domain.repository.ProductRepository
 import com.example.domain.utils.SortOption
 import org.jetbrains.exposed.sql.SortOrder
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.coalesce
 import org.jetbrains.exposed.sql.and
 
 class DefaultProductRepository : ProductRepository {
@@ -77,11 +78,19 @@ class DefaultProductRepository : ProductRepository {
             }.limit(request.limit, offset)
                 .orderBy(
                     when (request.sort) {
-                        SortOption.PRICE_ASC -> ProductTable.price to SortOrder.ASC
-                        SortOption.PRICE_DESC -> ProductTable.price to SortOrder.DESC
+                        SortOption.PRICE_ASC -> coalesce(
+                            ProductTable.discountPrice,
+                            ProductTable.price
+                        ) to SortOrder.ASC
+
+                        SortOption.PRICE_DESC -> coalesce(
+                            ProductTable.discountPrice,
+                            ProductTable.price
+                        ) to SortOrder.DESC
                         SortOption.POPULARITY -> ProductTable.popularityRating to SortOrder.DESC
                     }
-                ).mapOrTrowIfEmpty { it.toProduct() }
+                ).orderBy(ProductTable.popularityRating to SortOrder.DESC)
+                .mapOrTrowIfEmpty { it.toProduct() }
         }
     }
 }

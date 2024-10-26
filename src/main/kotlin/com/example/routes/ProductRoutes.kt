@@ -3,7 +3,8 @@ package com.example.routes
 import com.example.domain.model.Product
 import com.example.domain.model.SearchRequest
 import com.example.domain.repository.ProductRepository
-import com.example.routes.utils.by
+import com.example.domain.utils.ProductSortOption
+import com.example.routes.utils.getBy
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.plugins.*
@@ -22,8 +23,8 @@ fun Application.productRoutes(repo: ProductRepository) = routing {
     }
 }
 
-fun Route.getAll(repo: ProductRepository) = by { limit, offset ->
-    repo.all(limit, offset).getOrThrow().let { productList ->
+fun Route.getAll(repo: ProductRepository) = getBy<ProductSortOption> { limit, offset, sortOption ->
+    repo.all(limit, offset, sortOption).getOrThrow().let { productList ->
         call.respond(productList)
     }
 }
@@ -38,9 +39,9 @@ fun Route.getById(repo: ProductRepository) = get("/{id?}") {
 
 
 fun Route.getByCategory(repo: ProductRepository) = route("/category/{category?}") {
-    by { limit, offset ->
+    getBy<ProductSortOption> { limit, offset, sortOption ->
         call.parameters["category"]?.let { category: String ->
-            repo.findByCategory(category, limit, offset).getOrThrow().let { products: List<Product> ->
+            repo.findByCategory(category, limit, offset, sortOption).getOrThrow().let { products: List<Product> ->
                 call.respond(products)
             }
         } ?: throw MissingRequestParameterException("category name")
@@ -48,8 +49,8 @@ fun Route.getByCategory(repo: ProductRepository) = route("/category/{category?}"
 }
 
 fun Route.getBestseller(repo: ProductRepository) = route("/bestseller") {
-    by { limit, offset ->
-        repo.findBestsellers(limit, offset).getOrThrow().let { productList ->
+    getBy<ProductSortOption> { limit, offset, sortOption ->
+        repo.findBestsellers(limit, offset, sortOption).getOrThrow().let { productList ->
             call.respond(productList)
         }
     }
@@ -57,8 +58,8 @@ fun Route.getBestseller(repo: ProductRepository) = route("/bestseller") {
 
 fun Route.getFavoriteByUserId(repo: ProductRepository) = authenticate {
     route("/favorite") {
-        by { id, limit, offset ->
-            repo.findFavoriteProduct(id, limit, offset).getOrThrow().let { productList ->
+        getBy<ProductSortOption> { id, limit, offset, sortOption ->
+            repo.findFavoriteProduct(id, limit, offset, sortOption).getOrThrow().let { productList ->
                 call.respond(productList)
             }
         }

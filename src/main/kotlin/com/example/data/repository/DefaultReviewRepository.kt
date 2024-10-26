@@ -9,25 +9,38 @@ import com.example.data.utils.mapOrTrowIfEmpty
 import com.example.data.utils.withTransactionContext
 import com.example.domain.model.Review
 import com.example.domain.repository.ReviewRepository
+import com.example.domain.utils.ReviewSortOption
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.SizedIterable
+import org.jetbrains.exposed.sql.SortOrder
 
 class DefaultReviewRepository : ReviewRepository {
-    override suspend fun findAllByProductId(productId: Int, limit: Int, offset: Long): Result<List<Review>> =
+    override suspend fun findAllByProductId(
+        productId: Int,
+        limit: Int,
+        offset: Long,
+        sort: ReviewSortOption
+    ): Result<List<Review>> =
         runCatching {
-        withTransactionContext {
-            ReviewEntity.find {
-                ReviewTable.productId eq productId
-            }.limit(limit, offset).mapOrTrowIfEmpty {
-                it.toReview()
+            withTransactionContext {
+                ReviewEntity.find {
+                    ReviewTable.productId eq productId
+                }.limit(limit, offset).sortBy(sort).mapOrTrowIfEmpty {
+                    it.toReview()
+                }
             }
         }
-    }
 
-    override suspend fun findAllByUserId(userId: Int, limit: Int, offset: Long): Result<List<Review>> = runCatching {
+    override suspend fun findAllByUserId(
+        userId: Int,
+        limit: Int,
+        offset: Long,
+        sort: ReviewSortOption
+    ): Result<List<Review>> = runCatching {
         withTransactionContext {
             ReviewEntity.find {
                 ReviewTable.userId eq userId
-            }.limit(limit, offset).mapOrTrowIfEmpty {
+            }.limit(limit, offset).sortBy(sort).mapOrTrowIfEmpty {
                 it.toReview()
             }
         }
@@ -61,3 +74,13 @@ class DefaultReviewRepository : ReviewRepository {
         }
     }
 }
+
+private fun <T> SizedIterable<T>.sortBy(sort: ReviewSortOption): SizedIterable<T> =
+    orderBy(
+        when (sort) {
+            ReviewSortOption.RATING_ASC -> ReviewTable.rating to SortOrder.ASC
+            ReviewSortOption.RATING_DESC -> ReviewTable.rating to SortOrder.DESC
+            ReviewSortOption.DATE_DESC -> ReviewTable.reviewDate to SortOrder.DESC
+            ReviewSortOption.DATE_ASC -> ReviewTable.reviewDate to SortOrder.ASC
+        }
+    )

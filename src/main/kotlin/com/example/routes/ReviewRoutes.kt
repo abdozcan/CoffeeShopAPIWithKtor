@@ -2,7 +2,8 @@ package com.example.routes
 
 import com.example.domain.model.Review
 import com.example.domain.repository.ReviewRepository
-import com.example.routes.utils.by
+import com.example.domain.utils.ReviewSortOption
+import com.example.routes.utils.getBy
 import io.ktor.server.application.*
 import io.ktor.server.plugins.*
 import io.ktor.server.request.*
@@ -20,16 +21,16 @@ fun Application.reviewRoutes(reviewRepo: ReviewRepository) = routing {
 }
 
 fun Route.getAllByProductId(repo: ReviewRepository) = route("/product") {
-    by { id, limit, offset ->
-        repo.findAllByProductId(id, limit, offset).getOrThrow().let { reviewList ->
+    getBy<ReviewSortOption> { id, limit, offset, sortOption ->
+        repo.findAllByProductId(id, limit, offset, sortOption).getOrThrow().let { reviewList ->
             call.respond(reviewList)
         }
     }
 }
 
 fun Route.getAllByUserId(repo: ReviewRepository) = route("/user") {
-    by { id, limit, offset ->
-        repo.findAllByUserId(id, limit, offset).getOrThrow().let { reviewList ->
+    getBy<ReviewSortOption> { id, limit, offset, sortOption ->
+        repo.findAllByUserId(id, limit, offset, sortOption).getOrThrow().let { reviewList ->
             call.respond(reviewList)
         }
     }

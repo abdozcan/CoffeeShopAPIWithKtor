@@ -12,21 +12,22 @@ import com.example.domain.repository.ReviewRepository
 import org.jetbrains.exposed.dao.id.EntityID
 
 class DefaultReviewRepository : ReviewRepository {
-    override suspend fun findAllByProductId(productId: Int): Result<List<Review>> = runCatching {
+    override suspend fun findAllByProductId(productId: Int, limit: Int, offset: Long): Result<List<Review>> =
+        runCatching {
         withTransactionContext {
             ReviewEntity.find {
                 ReviewTable.productId eq productId
-            }.mapOrTrowIfEmpty {
+            }.limit(limit, offset).mapOrTrowIfEmpty {
                 it.toReview()
             }
         }
     }
 
-    override suspend fun findAllByUserId(userId: Int): Result<List<Review>> = runCatching {
+    override suspend fun findAllByUserId(userId: Int, limit: Int, offset: Long): Result<List<Review>> = runCatching {
         withTransactionContext {
             ReviewEntity.find {
                 ReviewTable.userId eq userId
-            }.mapOrTrowIfEmpty {
+            }.limit(limit, offset).mapOrTrowIfEmpty {
                 it.toReview()
             }
         }

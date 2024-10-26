@@ -28,7 +28,6 @@ fun Route.getAll(repo: ProductRepository) = by { limit, offset ->
     }
 }
 
-
 fun Route.getById(repo: ProductRepository) = get("/{id?}") {
     call.parameters["id"]?.toInt()?.let { id ->
         repo.findById(id).getOrThrow().let { product ->
@@ -38,17 +37,17 @@ fun Route.getById(repo: ProductRepository) = get("/{id?}") {
 }
 
 
-fun Route.getByCategory(repo: ProductRepository) = get("/category/{category?}") {
-    call.parameters["category"]?.let { category: String ->
-        by { limit, offset ->
+fun Route.getByCategory(repo: ProductRepository) = route("/category/{category?}") {
+    by { limit, offset ->
+        call.parameters["category"]?.let { category: String ->
             repo.findByCategory(category, limit, offset).getOrThrow().let { products: List<Product> ->
                 call.respond(products)
             }
-        }
-    } ?: throw MissingRequestParameterException("category name")
+        } ?: throw MissingRequestParameterException("category name")
+    }
 }
 
-fun Route.getBestseller(repo: ProductRepository) = get("/bestseller") {
+fun Route.getBestseller(repo: ProductRepository) = route("/bestseller") {
     by { limit, offset ->
         repo.findBestsellers(limit, offset).getOrThrow().let { productList ->
             call.respond(productList)
@@ -57,7 +56,7 @@ fun Route.getBestseller(repo: ProductRepository) = get("/bestseller") {
 }
 
 fun Route.getFavoriteByUserId(repo: ProductRepository) = authenticate {
-    get("/favorite") {
+    route("/favorite") {
         by { id, limit, offset ->
             repo.findFavoriteProduct(id, limit, offset).getOrThrow().let { productList ->
                 call.respond(productList)

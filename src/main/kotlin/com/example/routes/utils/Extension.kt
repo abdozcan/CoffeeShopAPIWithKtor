@@ -4,12 +4,12 @@ import io.ktor.server.plugins.*
 import io.ktor.server.routing.*
 
 fun Route.by(block: suspend RoutingContext.(id: Int, limit: Int, offset: Long) -> Unit) =
-    get("/{id?}") {
-        call.parameters["id"]?.toInt()?.let { id ->
-            by { limit, offset ->
+    route("/{id?}") {
+        by { limit, offset ->
+            call.parameters["id"]?.toInt()?.let { id ->
                 block(id, limit, offset)
-            }
-        } ?: throw MissingRequestParameterException("ID")
+            } ?: throw MissingRequestParameterException("ID")
+        }
     }
 
 fun Route.by(block: suspend RoutingContext.(limit: Int, offset: Long) -> Unit) =

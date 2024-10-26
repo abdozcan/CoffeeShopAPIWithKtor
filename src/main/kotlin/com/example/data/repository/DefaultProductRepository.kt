@@ -22,7 +22,7 @@ class DefaultProductRepository : ProductRepository {
         }
     }
 
-    override suspend fun findById(id: Int, limit: Int, offset: Long): Result<Product> = runCatching {
+    override suspend fun findById(id: Int): Result<Product> = runCatching {
         withTransactionContext {
             ProductEntity.findById(id).doOrThrowIfNull { it.toProduct() }
         }

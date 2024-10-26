@@ -12,7 +12,7 @@ fun Route.by(block: suspend RoutingContext.(id: Int, limit: Int, offset: Long) -
         } ?: throw MissingRequestParameterException("ID")
     }
 
-fun Route.by(block: suspend Route.(limit: Int, offset: Long) -> Unit) =
+fun Route.by(block: suspend RoutingContext.(limit: Int, offset: Long) -> Unit) =
     get("/limit/{limit?}/page/{page?}") {
         call.parameters["limit"]?.toInt()?.let { limit ->
             call.parameters["page"]?.toLong()?.let { page ->

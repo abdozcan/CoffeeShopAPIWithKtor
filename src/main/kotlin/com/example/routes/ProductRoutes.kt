@@ -22,21 +22,21 @@ fun Application.productRoutes(repo: ProductRepository) = routing {
     }
 }
 
-fun Route.getAll(repo: ProductRepository) = get {
-    by { limit, offset ->
-        repo.all(limit, offset).getOrThrow().let { productList ->
-            call.respond(productList)
-        }
+fun Route.getAll(repo: ProductRepository) = by { limit, offset ->
+    repo.all(limit, offset).getOrThrow().let { productList ->
+        call.respond(productList)
     }
 }
 
-fun Route.getById(repo: ProductRepository) {
-    by { id, limit, offset ->
-        repo.findById(id, limit, offset).getOrThrow().let { product ->
+
+fun Route.getById(repo: ProductRepository) = get("/{id?}") {
+    call.parameters["id"]?.toInt()?.let { id ->
+        repo.findById(id).getOrThrow().let { product ->
             call.respond(product)
         }
-    }
+    } ?: throw MissingRequestParameterException("ID")
 }
+
 
 fun Route.getByCategory(repo: ProductRepository) = get("/category/{category?}") {
     call.parameters["category"]?.let { category: String ->

@@ -5,7 +5,7 @@ import com.example.domain.model.SearchRequest
 
 interface ProductRepository {
     suspend fun all(limit: Int, offset: Long): Result<List<Product>>
-    suspend fun findById(id: Int, limit: Int, offset: Long): Result<Product>
+    suspend fun findById(id: Int): Result<Product>
 
 
     /**

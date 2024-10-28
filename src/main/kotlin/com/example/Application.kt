@@ -72,6 +72,8 @@ private fun Application.configureRouting(audience: String, issuer: String, secre
     val favoriteRepo: FavoriteRepository = DefaultFavoriteRepository()
     val reviewRepo: ReviewRepository = DefaultReviewRepository()
     val orderRepo: OrderRepository = DefaultOrderRepository()
+    val categoryRepo: CategoryRepository = DefaultCategoryRepository()
+
 
     productRoutes(productRepo)
     userRoutes(userRepo)
@@ -81,6 +83,7 @@ private fun Application.configureRouting(audience: String, issuer: String, secre
     reviewRoutes(reviewRepo)
     orderRoutes(orderRepo)
     addressRoutes(addressRepo)
+    categoryRoutes(categoryRepo)
 }
 
 private fun Application.configureDatabase() {

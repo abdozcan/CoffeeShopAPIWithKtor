@@ -30,19 +30,22 @@ fun Route.getAll(repo: ProductRepository) = getBy<ProductSortOption> { limit, of
     }
 }
 
-fun Route.getById(productRepo: ProductRepository, userRepo: UserRepository) = get("/{id?}") {
-    call.parameters["id"]?.toInt()?.let { id ->
-        // if the user is authenticated, get the user id to check whether the product is favorite
-        val email: String? = call.principal<JWTPrincipal>()?.payload?.getClaim("email")?.asString()
-        val userId: Int? = email?.let { email ->
-            userRepo.findByEmail(email).getOrThrow().id
-        }
+fun Route.getById(productRepo: ProductRepository, userRepo: UserRepository) = authenticate(
+    strategy = AuthenticationStrategy.Optional
+) {
+    get("/{id?}") {
+        call.parameters["id"]?.toInt()?.let { id ->
+            // if the user is authenticated, get the user id to check whether the product is favorite
+            val email: String? = call.principal<JWTPrincipal>()?.payload?.getClaim("email")?.asString()
+            val userId: Int? = email?.let { email ->
+                userRepo.findByEmail(email).getOrThrow().id
+            }
 
-        productRepo.findById(id, userId).getOrThrow().let { product ->
-            call.respond(product)
-        }
-    } ?: throw MissingRequestParameterException("ID")
-
+            productRepo.findById(id, userId).getOrThrow().let { product ->
+                call.respond(product)
+            }
+        } ?: throw MissingRequestParameterException("ID")
+    }
 }
 
 

@@ -14,9 +14,11 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
 fun Application.authRoutes(repo: UserRepository, authManager: AuthManager) = routing {
-    refreshToken(authManager)
-    login(repo, authManager)
-    register(repo, authManager)
+    route("auth") {
+        refreshToken(authManager)
+        login(repo, authManager)
+        register(repo, authManager)
+    }
 }
 
 fun Route.refreshToken(authManager: AuthManager) = authenticate {

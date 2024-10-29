@@ -8,6 +8,7 @@ import com.example.data.utils.doOrThrowIfNull
 import com.example.data.utils.mapOrTrowIfEmpty
 import com.example.data.utils.withTransactionContext
 import com.example.domain.model.Product
+import com.example.domain.model.ProductInfo
 import com.example.domain.model.SearchRequest
 import com.example.domain.repository.ProductRepository
 import com.example.domain.utils.ProductSortOption
@@ -17,10 +18,10 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.coalesce
 import org.jetbrains.exposed.sql.and
 
 class DefaultProductRepository : ProductRepository {
-    override suspend fun all(limit: Int, offset: Long, sortOption: ProductSortOption): Result<List<Product>> =
+    override suspend fun all(limit: Int, offset: Long, sortOption: ProductSortOption): Result<List<ProductInfo>> =
         runCatching {
         withTransactionContext {
-            ProductEntity.all().limit(limit, offset).sortBy(sortOption).mapOrTrowIfEmpty { it.toProduct() }
+            ProductEntity.all().limit(limit, offset).sortBy(sortOption).mapOrTrowIfEmpty { it.toProductInfo() }
         }
     }
 
@@ -35,13 +36,13 @@ class DefaultProductRepository : ProductRepository {
         limit: Int,
         offset: Long,
         sortOption: ProductSortOption
-    ): Result<List<Product>> =
+    ): Result<List<ProductInfo>> =
         runCatching {
             withTransactionContext {
                 ProductEntity.find {
                     ProductTable.category eq category
                 }.limit(limit, offset).sortBy(sortOption).mapOrTrowIfEmpty {
-                    it.toProduct()
+                    it.toProductInfo()
                 }
             }
         }
@@ -50,13 +51,13 @@ class DefaultProductRepository : ProductRepository {
         limit: Int,
         offset: Long,
         sortOption: ProductSortOption
-    ): Result<List<Product>> =
+    ): Result<List<ProductInfo>> =
         runCatching {
             withTransactionContext {
                 ProductEntity.find {
                     ProductTable.bestseller eq true
                 }.limit(limit, offset).sortBy(sortOption).mapOrTrowIfEmpty {
-                    it.toProduct()
+                    it.toProductInfo()
                 }
             }
         }
@@ -66,19 +67,19 @@ class DefaultProductRepository : ProductRepository {
         limit: Int,
         offset: Long,
         sortOption: ProductSortOption
-    ): Result<List<Product>> =
+    ): Result<List<ProductInfo>> =
         runCatching {
             withTransactionContext {
                 FavoriteEntity.find { FavoriteTable.userId eq userId }.limit(limit, offset).sortBy(sortOption)
                     .mapOrTrowIfEmpty { favoriteProduct ->
                         ProductEntity.findById(favoriteProduct.productId.value).doOrThrowIfNull { product ->
-                            product.toProduct()
+                            product.toProductInfo()
                         }
                     }
             }
         }
 
-    override suspend fun search(request: SearchRequest): Result<List<Product>> = runCatching {
+    override suspend fun search(request: SearchRequest): Result<List<ProductInfo>> = runCatching {
         val offset = (request.page - 1) * request.limit
 
         withTransactionContext {
@@ -91,7 +92,7 @@ class DefaultProductRepository : ProductRepository {
                     .and(ProductTable.price lessEq request.maxPrice)
             }.limit(request.limit, offset)
                 .sortBy(request.sort)
-                .mapOrTrowIfEmpty { it.toProduct() }
+                .mapOrTrowIfEmpty { it.toProductInfo() }
         }
     }
 }

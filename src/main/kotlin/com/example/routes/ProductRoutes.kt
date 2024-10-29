@@ -1,6 +1,5 @@
 package com.example.routes
 
-import com.example.domain.model.Product
 import com.example.domain.model.SearchRequest
 import com.example.domain.repository.ProductRepository
 import com.example.domain.utils.ProductSortOption
@@ -41,7 +40,7 @@ fun Route.getById(repo: ProductRepository) = get("/{id?}") {
 fun Route.getByCategory(repo: ProductRepository) = route("/category/{category?}") {
     getBy<ProductSortOption> { limit, offset, sortOption ->
         call.parameters["category"]?.let { category: String ->
-            repo.findByCategory(category, limit, offset, sortOption).getOrThrow().let { products: List<Product> ->
+            repo.findByCategory(category, limit, offset, sortOption).getOrThrow().let { products ->
                 call.respond(products)
             }
         } ?: throw MissingRequestParameterException("category name")

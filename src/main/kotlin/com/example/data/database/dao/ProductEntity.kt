@@ -3,6 +3,7 @@ package com.example.data.database.dao
 import com.example.data.database.table.ProductTable
 import com.example.data.database.table.ReviewTable
 import com.example.domain.model.Product
+import com.example.domain.model.ProductInfo
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -47,5 +48,17 @@ class ProductEntity(id: EntityID<Int>) : IntEntity(id) {
         discountPercentage = discountPercentage,
         bestseller = bestseller,
         reviews = reviews.map { it.toReview() }
+    )
+
+    fun toProductInfo() = ProductInfo(
+        id = id.value,
+        name = name,
+        price = price,
+        weight = weight,
+        imageUrl = imageUrl,
+        stockQuantity = stockQuantity,
+        popularityRating = popularityRating,
+        discountPrice = discountPrice,
+        discountPercentage = discountPercentage
     )
 }

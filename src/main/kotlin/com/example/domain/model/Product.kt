@@ -28,5 +28,7 @@ data class Product(
     @SerialName("discount_percentage")
     val discountPercentage: Double?,
     val bestseller: Boolean,
+    @SerialName("is_favorite")
+    val isFavorite: Boolean?,
     val reviews: List<Review>
 )

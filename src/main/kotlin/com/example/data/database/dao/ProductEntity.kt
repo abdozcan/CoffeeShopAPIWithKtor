@@ -1,5 +1,6 @@
 package com.example.data.database.dao
 
+import com.example.data.database.table.FavoriteTable
 import com.example.data.database.table.ProductTable
 import com.example.data.database.table.ReviewTable
 import com.example.domain.model.Product
@@ -7,6 +8,7 @@ import com.example.domain.model.ProductInfo
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.and
 
 
 class ProductEntity(id: EntityID<Int>) : IntEntity(id) {
@@ -30,7 +32,7 @@ class ProductEntity(id: EntityID<Int>) : IntEntity(id) {
 
     val reviews by ReviewEntity referrersOn ReviewTable.productId
 
-    fun toProduct() = Product(
+    fun toProduct(userId: Int?) = Product(
         id = id.value,
         name = name,
         description = description,
@@ -47,6 +49,7 @@ class ProductEntity(id: EntityID<Int>) : IntEntity(id) {
         discountPrice = discountPrice,
         discountPercentage = discountPercentage,
         bestseller = bestseller,
+        isFavorite = userId?.let { isFavoriteProduct(userId) },
         reviews = reviews.map { it.toReview() }
     )
 
@@ -61,4 +64,9 @@ class ProductEntity(id: EntityID<Int>) : IntEntity(id) {
         discountPrice = discountPrice,
         discountPercentage = discountPercentage
     )
+
+    private fun isFavoriteProduct(userId: Int): Boolean = FavoriteEntity.find {
+        (FavoriteTable.productId eq id.value) and (FavoriteTable.userId eq userId)
+    }.none().not()
+
 }

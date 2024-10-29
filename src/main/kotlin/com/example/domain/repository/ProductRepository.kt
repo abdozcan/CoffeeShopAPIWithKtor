@@ -7,7 +7,7 @@ import com.example.domain.utils.ProductSortOption
 
 interface ProductRepository {
     suspend fun all(limit: Int, offset: Long, sortOption: ProductSortOption): Result<List<ProductInfo>>
-    suspend fun findById(id: Int): Result<Product>
+    suspend fun findById(id: Int, userId: Int?): Result<Product>
     suspend fun findByCategory(
         category: String,
         limit: Int,

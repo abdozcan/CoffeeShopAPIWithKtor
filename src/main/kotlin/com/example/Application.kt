@@ -75,7 +75,7 @@ private fun Application.configureRouting(audience: String, issuer: String, secre
     val categoryRepo: CategoryRepository = DefaultCategoryRepository()
 
 
-    productRoutes(productRepo)
+    productRoutes(productRepo, userRepo)
     userRoutes(userRepo)
     authRoutes(userRepo, authManager)
     cartRoutes(cartRepo)

@@ -2,23 +2,25 @@ package com.example.routes
 
 import com.example.domain.model.SearchRequest
 import com.example.domain.repository.ProductRepository
+import com.example.domain.repository.UserRepository
 import com.example.domain.utils.ProductSortOption
 import com.example.routes.utils.getBy
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
 import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Application.productRoutes(repo: ProductRepository) = routing {
+fun Application.productRoutes(productRepo: ProductRepository, userRepo: UserRepository) = routing {
     route("/product") {
-        getAll(repo)
-        getById(repo)
-        getByCategory(repo)
-        getBestseller(repo)
-        getFavoriteByUserId(repo)
-        search(repo)
+        getAll(productRepo)
+        getById(productRepo, userRepo)
+        getByCategory(productRepo)
+        getBestseller(productRepo)
+        getFavoriteByUserId(productRepo)
+        search(productRepo)
     }
 }
 
@@ -28,12 +30,19 @@ fun Route.getAll(repo: ProductRepository) = getBy<ProductSortOption> { limit, of
     }
 }
 
-fun Route.getById(repo: ProductRepository) = get("/{id?}") {
+fun Route.getById(productRepo: ProductRepository, userRepo: UserRepository) = get("/{id?}") {
     call.parameters["id"]?.toInt()?.let { id ->
-        repo.findById(id).getOrThrow().let { product ->
+        // if the user is authenticated, get the user id to check whether the product is favorite
+        val email: String? = call.principal<JWTPrincipal>()?.payload?.getClaim("email")?.asString()
+        val userId: Int? = email?.let { email ->
+            userRepo.findByEmail(email).getOrThrow().id
+        }
+
+        productRepo.findById(id, userId).getOrThrow().let { product ->
             call.respond(product)
         }
     } ?: throw MissingRequestParameterException("ID")
+
 }
 
 

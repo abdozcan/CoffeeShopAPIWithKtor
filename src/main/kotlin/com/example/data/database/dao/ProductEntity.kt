@@ -28,7 +28,7 @@ class ProductEntity(id: EntityID<Int>) : IntEntity(id) {
     var popularityRating by ProductTable.popularityRating
     var discountPrice by ProductTable.discountPrice
     var discountPercentage by ProductTable.discountPercentage
-    var bestseller by ProductTable.bestseller
+    var isBestseller by ProductTable.isBestseller
 
     val reviews by ReviewEntity referrersOn ReviewTable.productId
 
@@ -48,7 +48,7 @@ class ProductEntity(id: EntityID<Int>) : IntEntity(id) {
         popularityRating = popularityRating,
         discountPrice = discountPrice,
         discountPercentage = discountPercentage,
-        bestseller = bestseller,
+        isBestseller = isBestseller,
         isFavorite = userId?.let { isFavoriteProduct(userId) },
         reviews = reviews.map { it.toReview() }
     )

@@ -17,5 +17,5 @@ object ProductTable : IntIdTable("products") {
     val popularityRating = float("popularity_rating")
     val discountPrice = double("discount_price").nullable()
     val discountPercentage = double("discount_percentage").nullable()
-    val bestseller = bool("bestseller")
+    val isBestseller = bool("is_bestseller")
 }

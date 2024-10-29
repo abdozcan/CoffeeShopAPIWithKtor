@@ -55,7 +55,7 @@ class DefaultProductRepository : ProductRepository {
         runCatching {
             withTransactionContext {
                 ProductEntity.find {
-                    ProductTable.bestseller eq true
+                    ProductTable.isBestseller eq true
                 }.limit(limit, offset).sortBy(sortOption).mapOrTrowIfEmpty {
                     it.toProductInfo()
                 }

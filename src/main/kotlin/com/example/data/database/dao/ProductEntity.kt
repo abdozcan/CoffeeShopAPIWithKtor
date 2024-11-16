@@ -5,6 +5,7 @@ import com.example.data.database.table.ProductTable
 import com.example.data.database.table.ReviewTable
 import com.example.domain.model.Product
 import com.example.domain.model.ProductInfo
+import com.example.domain.model.SearchResultProductInfo
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -63,6 +64,13 @@ class ProductEntity(id: EntityID<Int>) : IntEntity(id) {
         popularityRating = popularityRating,
         discountPrice = discountPrice,
         discountPercentage = discountPercentage
+    )
+
+    fun toSearchResultProductInfo() = SearchResultProductInfo(
+        id = id.value,
+        name = name,
+        category = category,
+        image = imageUrl
     )
 
     private fun isFavoriteProduct(userId: Int): Boolean = FavoriteEntity.find {

@@ -2,16 +2,18 @@ package com.example.routes
 
 import com.example.auth.AuthManager
 import com.example.auth.model.Credential
-import com.example.auth.model.RefreshTokenRequest
+import com.example.auth.model.RefreshToken
 import com.example.auth.model.Tokens
-import com.example.domain.model.User
+import com.example.domain.model.RegisterUser
 import com.example.domain.repository.UserRepository
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.Serializable
 
 fun Application.authRoutes(repo: UserRepository, authManager: AuthManager) = routing {
     route("auth") {
@@ -23,17 +25,19 @@ fun Application.authRoutes(repo: UserRepository, authManager: AuthManager) = rou
 
 fun Route.refreshToken(authManager: AuthManager) = authenticate {
     post("/refresh_token") {
-        call.receive<RefreshTokenRequest>().let { refreshTokenRequest ->
+        call.receive<RefreshToken>().let { refreshToken ->
+            val email: String = call.principal<JWTPrincipal>()?.payload?.getClaim("email")?.asString()!!
+
             authManager.verifyToken(
-                token = refreshTokenRequest.refreshToken,
-                email = refreshTokenRequest.email,
+                token = refreshToken.refreshToken,
+                email = email,
                 type = "refresh"
             ).getOrThrow()
             call.respond(
                 HttpStatusCode.OK,
                 Tokens(
-                    accessToken = authManager.createToken(email = refreshTokenRequest.email, type = "access"),
-                    refreshToken = authManager.createToken(email = refreshTokenRequest.email, type = "refresh")
+                    accessToken = authManager.createToken(email = email, type = "access"),
+                    refreshToken = authManager.createToken(email = email, type = "refresh")
                 )
             )
         }
@@ -56,18 +60,23 @@ fun Route.login(repo: UserRepository, authManager: AuthManager) = post("/login")
 }
 
 fun Route.register(repo: UserRepository, authManager: AuthManager) = post("/register") {
-    call.receive<User>().let { user ->
+    call.receive<RegisterUser>().let { user ->
         if (repo.isEmailUsed(user.email))
-            return@post call.respond(HttpStatusCode.Conflict, "Email already used.")
+            return@post call.respond(
+                HttpStatusCode.Conflict,
+                ErrorResponse(error = "Email already used", type = RegisterErrorType.EMAIL_USED)
+            )
         if (repo.isPhoneUsed(user.phone))
-            return@post call.respond(HttpStatusCode.Conflict, "Phone already used.")
+            return@post call.respond(
+                HttpStatusCode.Conflict,
+                ErrorResponse(error = "Phone already used", type = RegisterErrorType.PHONE_USED)
+            )
 
         repo.add(
             user.name,
             user.password,
             user.email,
-            user.phone,
-            user.defaultAddress
+            user.phone
         ).getOrThrow().let { addedUser ->
             call.respond(
                 HttpStatusCode.Created,
@@ -78,4 +87,15 @@ fun Route.register(repo: UserRepository, authManager: AuthManager) = post("/regi
             )
         }
     }
+}
+
+@Serializable
+private data class ErrorResponse(
+    val error: String,
+    val type: RegisterErrorType,
+)
+
+private enum class RegisterErrorType {
+    EMAIL_USED,
+    PHONE_USED
 }

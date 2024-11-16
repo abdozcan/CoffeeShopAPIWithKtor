@@ -3,6 +3,7 @@ package com.example.domain.repository
 import com.example.domain.model.Product
 import com.example.domain.model.ProductInfo
 import com.example.domain.model.SearchRequest
+import com.example.domain.model.SearchResultProductInfo
 import com.example.domain.utils.ProductSortOption
 
 interface ProductRepository {
@@ -23,5 +24,5 @@ interface ProductRepository {
         sortOption: ProductSortOption
     ): Result<List<ProductInfo>>
 
-    suspend fun search(request: SearchRequest): Result<List<ProductInfo>>
+    suspend fun search(request: SearchRequest): Result<List<SearchResultProductInfo>>
 }

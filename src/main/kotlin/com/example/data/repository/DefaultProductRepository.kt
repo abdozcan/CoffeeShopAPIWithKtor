@@ -10,6 +10,7 @@ import com.example.data.utils.withTransactionContext
 import com.example.domain.model.Product
 import com.example.domain.model.ProductInfo
 import com.example.domain.model.SearchRequest
+import com.example.domain.model.SearchResultProductInfo
 import com.example.domain.repository.ProductRepository
 import com.example.domain.utils.ProductSortOption
 import org.jetbrains.exposed.sql.SizedIterable
@@ -79,7 +80,7 @@ class DefaultProductRepository : ProductRepository {
             }
         }
 
-    override suspend fun search(request: SearchRequest): Result<List<ProductInfo>> = runCatching {
+    override suspend fun search(request: SearchRequest): Result<List<SearchResultProductInfo>> = runCatching {
         val offset = (request.page - 1) * request.limit
 
         withTransactionContext {
@@ -92,7 +93,7 @@ class DefaultProductRepository : ProductRepository {
                     .and(ProductTable.price lessEq request.maxPrice)
             }.limit(request.limit, offset)
                 .sortBy(request.sort)
-                .mapOrTrowIfEmpty { it.toProductInfo() }
+                .mapOrTrowIfEmpty { it.toSearchResultProductInfo() }
         }
     }
 }

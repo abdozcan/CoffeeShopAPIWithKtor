@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SearchRequest(
     val name: String,
-    val category: String?,
+    val category: String? = null,
     @SerialName("min_price")
     val minPrice: Double = 0.0,
     @SerialName("max_price")

@@ -13,8 +13,7 @@ interface UserRepository {
         name: String,
         password: String,
         email: String,
-        phone: String,
-        defaultAddress: String?
+        phone: String
     ): Result<User>
     suspend fun delete(id: Int): Result<Unit>
     suspend fun selectDefaultAddress(userId: Int, address: String): Result<User>

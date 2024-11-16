@@ -43,8 +43,7 @@ class DefaultUserRepository : UserRepository {
         name: String,
         password: String,
         email: String,
-        phone: String,
-        defaultAddress: String?
+        phone: String
     ): Result<User> = runCatching {
         withTransactionContext {
             UserEntity.new {
@@ -52,7 +51,6 @@ class DefaultUserRepository : UserRepository {
                 this.password = password
                 this.email = email
                 this.phone = phone
-                this.defaultAddress = defaultAddress
             }.toUser()
         }
     }

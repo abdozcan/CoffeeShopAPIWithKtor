@@ -21,10 +21,10 @@ import org.jetbrains.exposed.sql.and
 class DefaultProductRepository : ProductRepository {
     override suspend fun all(limit: Int, offset: Long, sortOption: ProductSortOption): Result<List<ProductInfo>> =
         runCatching {
-        withTransactionContext {
-            ProductEntity.all().limit(limit, offset).sortBy(sortOption).mapOrTrowIfEmpty { it.toProductInfo() }
+            withTransactionContext {
+                ProductEntity.all().limit(limit, offset).sortBy(sortOption).mapOrTrowIfEmpty { it.toProductInfo() }
+            }
         }
-    }
 
     override suspend fun findById(id: Int, userId: Int?): Result<Product> = runCatching {
         withTransactionContext {
@@ -62,6 +62,44 @@ class DefaultProductRepository : ProductRepository {
                 }
             }
         }
+
+    override suspend fun findPopulars(
+        limit: Int,
+        offset: Long
+    ): Result<List<ProductInfo>> = runCatching {
+        withTransactionContext {
+            ProductEntity.all()
+                .orderBy(ProductTable.popularityRating to SortOrder.DESC)
+                .limit(limit, offset)
+                .mapOrTrowIfEmpty {
+                    it.toProductInfo()
+                }
+        }
+    }
+
+    override suspend fun findNewest(
+        limit: Int,
+        offset: Long
+    ): Result<List<ProductInfo>> = runCatching {
+        withTransactionContext {
+            ProductEntity.all()
+                .orderBy(ProductTable.id to SortOrder.DESC)
+                .limit(limit, offset)
+                .mapOrTrowIfEmpty {
+                    it.toProductInfo()
+                }
+        }
+    }
+
+    override suspend fun findSpecialOffers(limit: Int, offset: Long): Result<List<ProductInfo>> = runCatching {
+        withTransactionContext {
+            ProductEntity.find {
+                ProductTable.discountPrice neq null
+            }.limit(limit, offset).mapOrTrowIfEmpty {
+                it.toProductInfo()
+            }
+        }
+    }
 
     override suspend fun findFavoriteProduct(
         userId: Int,

@@ -19,6 +19,9 @@ fun Application.productRoutes(productRepo: ProductRepository, userRepo: UserRepo
         getById(productRepo, userRepo)
         getByCategory(productRepo)
         getBestseller(productRepo)
+        getPopular(productRepo)
+        getNewest(productRepo)
+        getSpecialOffer(productRepo)
         getFavoriteByUserId(productRepo)
         search(productRepo)
     }
@@ -65,6 +68,39 @@ fun Route.getBestseller(repo: ProductRepository) = route("/bestseller") {
             call.respond(productList)
         }
     }
+}
+
+fun Route.getPopular(repo: ProductRepository) = get("/popular/limit/{limit?}/page/{page?}") {
+    call.parameters["limit"]?.toInt()?.let { limit ->
+        call.parameters["page"]?.toLong()?.let { page ->
+            val offset = (page - 1) * limit
+            repo.findPopulars(limit, offset).getOrThrow().let { productList ->
+                call.respond(productList)
+            }
+        } ?: throw MissingRequestParameterException("page")
+    } ?: throw MissingRequestParameterException("limit")
+}
+
+fun Route.getNewest(repo: ProductRepository) = get("/newest/limit/{limit?}/page/{page?}") {
+    call.parameters["limit"]?.toInt()?.let { limit ->
+        call.parameters["page"]?.toLong()?.let { page ->
+            val offset = (page - 1) * limit
+            repo.findNewest(limit, offset).getOrThrow().let { productList ->
+                call.respond(productList)
+            }
+        } ?: throw MissingRequestParameterException("page")
+    } ?: throw MissingRequestParameterException("limit")
+}
+
+fun Route.getSpecialOffer(repo: ProductRepository) = get("/special_offer/limit/{limit?}/page/{page?}") {
+    call.parameters["limit"]?.toInt()?.let { limit ->
+        call.parameters["page"]?.toLong()?.let { page ->
+            val offset = (page - 1) * limit
+            repo.findSpecialOffers(limit, offset).getOrThrow().let { productList ->
+                call.respond(productList)
+            }
+        } ?: throw MissingRequestParameterException("page")
+    } ?: throw MissingRequestParameterException("limit")
 }
 
 fun Route.getFavoriteByUserId(repo: ProductRepository) = authenticate {

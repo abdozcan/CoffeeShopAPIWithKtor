@@ -17,6 +17,9 @@ interface ProductRepository {
     ): Result<List<ProductInfo>>
 
     suspend fun findBestsellers(limit: Int, offset: Long, sortOption: ProductSortOption): Result<List<ProductInfo>>
+    suspend fun findPopulars(limit: Int, offset: Long): Result<List<ProductInfo>>
+    suspend fun findNewest(limit: Int, offset: Long): Result<List<ProductInfo>>
+    suspend fun findSpecialOffers(limit: Int, offset: Long): Result<List<ProductInfo>>
     suspend fun findFavoriteProduct(
         userId: Int,
         limit: Int,

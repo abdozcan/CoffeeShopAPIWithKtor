@@ -1,8 +1,11 @@
 package com.example.routes.utils
 
+import com.example.domain.repository.UserRepository
 import com.example.domain.utils.ProductSortOption
 import com.example.domain.utils.ReviewSortOption
 import com.example.domain.utils.SortOption
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
 import io.ktor.server.plugins.*
 import io.ktor.server.routing.*
 
@@ -34,4 +37,11 @@ inline fun <reified T : SortOption> Route.getBy(
             }
         } ?: throw MissingRequestParameterException("page")
     } ?: throw MissingRequestParameterException("limit")
+}
+
+suspend fun RoutingContext.getAuthenticatedUsersId(userRepo: UserRepository): Int? {
+    val email: String? = call.principal<JWTPrincipal>()?.payload?.getClaim("email")?.asString()
+    return email?.let { email ->
+        userRepo.findByEmail(email).getOrThrow().id
+    }
 }

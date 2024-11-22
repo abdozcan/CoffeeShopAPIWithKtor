@@ -4,10 +4,10 @@ import com.example.domain.model.SearchRequest
 import com.example.domain.repository.ProductRepository
 import com.example.domain.repository.UserRepository
 import com.example.domain.utils.ProductSortOption
+import com.example.routes.utils.getAuthenticatedUsersId
 import com.example.routes.utils.getBy
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import io.ktor.server.auth.jwt.*
 import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -39,10 +39,7 @@ fun Route.getById(productRepo: ProductRepository, userRepo: UserRepository) = au
     get("/{id?}") {
         call.parameters["id"]?.toInt()?.let { id ->
             // if the user is authenticated, get the user id to check whether the product is favorite
-            val email: String? = call.principal<JWTPrincipal>()?.payload?.getClaim("email")?.asString()
-            val userId: Int? = email?.let { email ->
-                userRepo.findByEmail(email).getOrThrow().id
-            }
+            val userId: Int? = getAuthenticatedUsersId(userRepo)
 
             productRepo.findById(id, userId).getOrThrow().let { product ->
                 call.respond(product)
@@ -50,7 +47,6 @@ fun Route.getById(productRepo: ProductRepository, userRepo: UserRepository) = au
         } ?: throw MissingRequestParameterException("ID")
     }
 }
-
 
 fun Route.getByCategory(repo: ProductRepository) = route("/category/{category?}") {
     getBy<ProductSortOption> { limit, offset, sortOption ->

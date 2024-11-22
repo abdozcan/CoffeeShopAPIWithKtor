@@ -1,50 +1,60 @@
 package com.example.routes
 
-import com.example.domain.model.FavoriteItem
+import com.auth0.jwt.exceptions.JWTVerificationException
 import com.example.domain.repository.FavoriteRepository
+import com.example.domain.repository.UserRepository
+import com.example.routes.utils.getAuthenticatedUsersId
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.plugins.*
-import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Application.favoriteRoutes(favoriteRepo: FavoriteRepository) = routing {
+fun Application.favoriteRoutes(favoriteRepo: FavoriteRepository, userRepo: UserRepository) = routing {
     authenticate {
-        getAll(favoriteRepo)
-        isFavorite(favoriteRepo)
-        add(favoriteRepo)
-        delete(favoriteRepo)
+        getAll(favoriteRepo, userRepo)
+        isFavorite(favoriteRepo, userRepo)
+        add(favoriteRepo, userRepo)
+        delete(favoriteRepo, userRepo)
     }
 }
 
-private fun Route.getAll(repo: FavoriteRepository) = get("/favorite/user/{userId?}") {
-    call.parameters["userId"]?.toInt()?.let { userId ->
-        repo.findAllByUserId(userId).getOrThrow().let { favoriteList ->
+private fun Route.getAll(favoriteRepo: FavoriteRepository, userRepo: UserRepository) = get("/favorite/all") {
+    getAuthenticatedUsersId(userRepo)?.let { userId ->
+        favoriteRepo.findAllByUserId(userId).getOrThrow().let { favoriteList ->
             call.respond(favoriteList)
         }
-    } ?: throw MissingRequestParameterException("user ID")
+    } ?: throw JWTVerificationException("Unauthorized")
 }
 
-private fun Route.isFavorite(repo: FavoriteRepository) = post("/favorite/is-favorite") {
-    call.receive<FavoriteItem>().let { item ->
-        repo.isFavorite(item.userId, item.productId).getOrThrow().let {
-            call.respond(HttpStatusCode.OK, it)
-        }
-    }
+private fun Route.isFavorite(favoriteRepo: FavoriteRepository, userRepo: UserRepository) =
+    post("/favorite/is-favorite/{product_id?}") {
+        getAuthenticatedUsersId(userRepo)?.let { userId ->
+            call.parameters["product_id"]?.toInt()?.let { productId ->
+                favoriteRepo.isFavorite(userId, productId).getOrThrow().let { isFavorite ->
+                    call.respond(HttpStatusCode.OK, isFavorite)
+                }
+            } ?: throw MissingRequestParameterException("product ID")
+        } ?: throw JWTVerificationException("Unauthorized")
 }
 
-private fun Route.add(repo: FavoriteRepository) = post("/favorite/add") {
-    call.receive<FavoriteItem>().let { item ->
-        repo.add(item.userId, item.productId).getOrThrow()
-        call.respond(HttpStatusCode.OK, "Added to favorite.")
-    }
+private fun Route.add(favoriteRepo: FavoriteRepository, userRepo: UserRepository) =
+    post("/favorite/add/{product_id?}") {
+        getAuthenticatedUsersId(userRepo)?.let { userId ->
+            call.parameters["product_id"]?.toInt()?.let { productId ->
+                favoriteRepo.add(userId, productId).getOrThrow()
+                call.respond(HttpStatusCode.OK, "Added to favorite.")
+            } ?: throw MissingRequestParameterException("product ID")
+        } ?: throw JWTVerificationException("Unauthorized")
 }
 
-private fun Route.delete(repo: FavoriteRepository) = delete("/favorite/delete/{product_id?}") {
-    call.parameters["product_id"]?.toInt()?.let { id ->
-        repo.delete(id).getOrThrow()
-        call.respond(HttpStatusCode.OK, "Favorite deleted successfully.")
-    } ?: throw MissingRequestParameterException("product ID")
+private fun Route.delete(favoriteRepo: FavoriteRepository, userRepo: UserRepository) =
+    delete("/favorite/delete/{product_id?}") {
+        getAuthenticatedUsersId(userRepo)?.let { userId ->
+            call.parameters["product_id"]?.toInt()?.let { productId ->
+                favoriteRepo.delete(userId, productId).getOrThrow()
+                call.respond(HttpStatusCode.OK, "Favorite deleted successfully.")
+            } ?: throw MissingRequestParameterException("product ID")
+        } ?: throw JWTVerificationException("Unauthorized")
 }

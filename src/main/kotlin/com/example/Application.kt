@@ -79,7 +79,7 @@ private fun Application.configureRouting(audience: String, issuer: String, secre
     userRoutes(userRepo)
     authRoutes(userRepo, authManager)
     cartRoutes(cartRepo)
-    favoriteRoutes(favoriteRepo)
+    favoriteRoutes(favoriteRepo, userRepo)
     reviewRoutes(reviewRepo)
     orderRoutes(orderRepo)
     addressRoutes(addressRepo)

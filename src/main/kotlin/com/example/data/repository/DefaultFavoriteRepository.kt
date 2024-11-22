@@ -41,9 +41,11 @@ class DefaultFavoriteRepository : FavoriteRepository {
         }
     }
 
-    override suspend fun delete(productId: Int): Result<Unit> = runCatching {
+    override suspend fun delete(userId: Int, productId: Int): Result<Unit> = runCatching {
         withTransactionContext {
-            FavoriteEntity.find { FavoriteTable.productId eq productId }.firstOrNull().doOrThrowIfNull { it.delete() }
+            FavoriteEntity.find {
+                (FavoriteTable.userId eq userId) and (FavoriteTable.productId eq productId)
+            }.firstOrNull().doOrThrowIfNull { it.delete() }
         }
     }
 }

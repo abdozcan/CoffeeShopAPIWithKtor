@@ -78,7 +78,7 @@ private fun Application.configureRouting(audience: String, issuer: String, secre
     productRoutes(productRepo, userRepo)
     userRoutes(userRepo)
     authRoutes(userRepo, authManager)
-    cartRoutes(cartRepo)
+    cartRoutes(cartRepo, userRepo)
     favoriteRoutes(favoriteRepo, userRepo)
     reviewRoutes(reviewRepo)
     orderRoutes(orderRepo)

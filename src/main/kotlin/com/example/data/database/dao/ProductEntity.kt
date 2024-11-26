@@ -70,7 +70,7 @@ class ProductEntity(id: EntityID<Int>) : IntEntity(id) {
         id = id.value,
         name = name,
         category = category,
-        image = imageUrl
+        imageUrl = imageUrl
     )
 
     private fun isFavoriteProduct(userId: Int): Boolean = FavoriteEntity.find {

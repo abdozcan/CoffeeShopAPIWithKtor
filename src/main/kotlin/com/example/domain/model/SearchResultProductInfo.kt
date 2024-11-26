@@ -7,5 +7,5 @@ data class SearchResultProductInfo(
     val id: Int,
     val name: String,
     val category: String,
-    val image: String,
+    val imageUrl: String,
 )

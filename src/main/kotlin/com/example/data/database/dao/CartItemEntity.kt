@@ -24,9 +24,12 @@ class CartItemEntity(id: EntityID<Int>) : IntEntity(id) {
 
     fun toCartItem() = CartItem(
         id = id.value,
-        userId = userId.value,
-        productInfo = product.toProductInfo(),
+        productId = product.id.value,
+        name = product.name,
+        weight = product.weight,
+        imageUrl = product.imageUrl,
         quantity = quantity,
+        stockQuantity = product.stockQuantity,
         price = if (isExpired) product.price else price,
         discountPrice = if (isExpired) product.discountPrice else discountPrice,
         discountPercentage = if (isExpired) product.discountPercentage else discountPercentage,

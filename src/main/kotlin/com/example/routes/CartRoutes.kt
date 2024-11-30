@@ -1,5 +1,6 @@
 package com.example.routes
 
+import com.example.domain.model.CartDeleteRequest
 import com.example.domain.model.CartItemRequest
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.UserRepository
@@ -7,25 +8,24 @@ import com.example.routes.utils.getAuthenticatedUsersId
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
 fun Application.cartRoutes(cartRepo: CartRepository, userRepo: UserRepository) = routing {
     authenticate {
-        getAll(cartRepo)
+        getAll(cartRepo, userRepo)
         add(cartRepo, userRepo)
         delete(cartRepo)
     }
 }
 
-private fun Route.getAll(repo: CartRepository) = get("/cart/user/{userId?}") {
-    call.parameters["userId"]?.toInt()?.let { userId ->
+private fun Route.getAll(repo: CartRepository, userRepo: UserRepository) = get("/cart/all") {
+    getAuthenticatedUsersId(userRepo = userRepo)?.let { userId ->
         repo.findAllByUserId(userId).getOrThrow().let { cartList ->
             call.respond(cartList)
         }
-    } ?: throw MissingRequestParameterException("user ID")
+    }
 }
 
 private fun Route.add(cartRepo: CartRepository, userRepo: UserRepository) = post("/cart/add") {
@@ -37,14 +37,14 @@ private fun Route.add(cartRepo: CartRepository, userRepo: UserRepository) = post
     }
 }
 
-private fun Route.delete(repo: CartRepository) = delete("/cart/delete") {
-    call.receive<List<Int>>().let { ids ->
-        if (ids.isEmpty())
-            return@delete call.respond(HttpStatusCode.BadRequest, "No ID found.")
+private fun Route.delete(repo: CartRepository) = post("/cart/delete") {
+    call.receive<CartDeleteRequest>().let { request ->
+        if (request.ids.isEmpty())
+            return@post call.respond(HttpStatusCode.BadRequest, "No ID found.")
 
-        repo.delete(ids).getOrThrow()
+        repo.delete(request.ids).getOrThrow()
         call.respond(
-            HttpStatusCode.OK, if (ids.size == 1) {
+            HttpStatusCode.OK, if (request.ids.size == 1) {
                 "Cart"
             } else {
                 "Carts"

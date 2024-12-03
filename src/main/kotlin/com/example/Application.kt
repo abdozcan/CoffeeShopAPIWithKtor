@@ -73,12 +73,13 @@ private fun Application.configureRouting(audience: String, issuer: String, secre
     val reviewRepo: ReviewRepository = DefaultReviewRepository()
     val orderRepo: OrderRepository = DefaultOrderRepository()
     val categoryRepo: CategoryRepository = DefaultCategoryRepository()
+    val promoCodeRepo: PromoCodeRepository = DefaultPromoCodeRepository()
 
 
     productRoutes(productRepo, userRepo)
     userRoutes(userRepo)
     authRoutes(userRepo, authManager)
-    cartRoutes(cartRepo, userRepo)
+    cartRoutes(cartRepo, userRepo, promoCodeRepo)
     favoriteRoutes(favoriteRepo, userRepo)
     reviewRoutes(reviewRepo)
     orderRoutes(orderRepo)
@@ -106,7 +107,9 @@ private fun Application.configureDatabase() {
                 OrderTable,
                 OrderItemTable,
                 PaymentTable,
-                PromotionTable
+                PromotionTable,
+                PromoCodeTable,
+                PromoCodeUsageTable
             )
         }
     }

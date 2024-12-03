@@ -2,7 +2,9 @@ package com.example.routes
 
 import com.example.domain.model.CartDeleteRequest
 import com.example.domain.model.CartItemRequest
+import com.example.domain.model.PromoRequest
 import com.example.domain.repository.CartRepository
+import com.example.domain.repository.PromoCodeRepository
 import com.example.domain.repository.UserRepository
 import com.example.routes.utils.getAuthenticatedUsersId
 import io.ktor.http.*
@@ -12,11 +14,16 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Application.cartRoutes(cartRepo: CartRepository, userRepo: UserRepository) = routing {
+fun Application.cartRoutes(
+    cartRepo: CartRepository,
+    userRepo: UserRepository,
+    promoCodeRepo: PromoCodeRepository
+) = routing {
     authenticate {
         getAll(cartRepo, userRepo)
         add(cartRepo, userRepo)
         delete(cartRepo)
+        applyPromoCode(promoCodeRepo, userRepo)
     }
 }
 
@@ -50,5 +57,22 @@ private fun Route.delete(repo: CartRepository) = post("/cart/delete") {
                 "Carts"
             } + " deleted successfully."
         )
+    }
+}
+
+private fun Route.applyPromoCode(
+    promoCodeRepo: PromoCodeRepository,
+    userRepo: UserRepository
+) = post("cart/apply-promo-code") {
+    getAuthenticatedUsersId(userRepo)?.let { userId ->
+        call.receive<PromoRequest>().let { request ->
+            promoCodeRepo.validate(
+                userId = userId,
+                code = request.code,
+                totalPrice = request.totalPrice
+            ).getOrThrow().let { respond ->
+                call.respond(HttpStatusCode.OK, respond)
+            }
+        }
     }
 }

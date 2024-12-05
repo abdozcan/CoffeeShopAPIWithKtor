@@ -136,7 +136,7 @@ class DefaultProductRepository : ProductRepository {
     }
 }
 
-private fun <T> SizedIterable<T>.sortBy(sort: ProductSortOption): SizedIterable<T> =
+fun <T> SizedIterable<T>.sortBy(sort: ProductSortOption): SizedIterable<T> =
     orderBy(
         when (sort) {
             ProductSortOption.PRICE_ASC -> coalesce(

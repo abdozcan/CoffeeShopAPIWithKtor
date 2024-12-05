@@ -3,7 +3,9 @@ package com.example.routes
 import com.auth0.jwt.exceptions.JWTVerificationException
 import com.example.domain.repository.FavoriteRepository
 import com.example.domain.repository.UserRepository
+import com.example.domain.utils.ProductSortOption
 import com.example.routes.utils.getAuthenticatedUsersId
+import com.example.routes.utils.getBy
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -20,12 +22,17 @@ fun Application.favoriteRoutes(favoriteRepo: FavoriteRepository, userRepo: UserR
     }
 }
 
-private fun Route.getAll(favoriteRepo: FavoriteRepository, userRepo: UserRepository) = get("/favorite/all") {
-    getAuthenticatedUsersId(userRepo)?.let { userId ->
-        favoriteRepo.findAllByUserId(userId).getOrThrow().let { favoriteList ->
-            call.respond(favoriteList)
-        }
-    } ?: throw JWTVerificationException("Unauthorized")
+private fun Route.getAll(
+    favoriteRepo: FavoriteRepository,
+    userRepo: UserRepository
+) = route("/favorite/all") {
+    getBy<ProductSortOption> { limit, offset, sortOption ->
+        getAuthenticatedUsersId(userRepo)?.let { userId ->
+            favoriteRepo.findAllByUserId(userId, limit, offset, sortOption).getOrThrow().let { favoriteList ->
+                call.respond(favoriteList)
+            }
+        } ?: throw JWTVerificationException("Unauthorized")
+    }
 }
 
 private fun Route.isFavorite(favoriteRepo: FavoriteRepository, userRepo: UserRepository) =

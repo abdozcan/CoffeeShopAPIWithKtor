@@ -12,11 +12,11 @@ class AddressEntity(id: EntityID<Int>) : IntEntity(id) {
     var name by AddressTable.name
     var userId by AddressTable.userId
     var address by AddressTable.address
+    var isDefault by AddressTable.isDefault
 
     fun toAddress() = Address(
         id = id.value,
         name = name,
-        userId = userId.value,
         address = address
     )
 }

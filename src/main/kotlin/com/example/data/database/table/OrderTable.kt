@@ -13,6 +13,7 @@ object OrderTable : IntIdTable("orders") {
     val totalAmount = double("total_amount")
     val shippingAddress = text("shipping_address")
     val paymentMethod = varchar("payment_method", 100)
+    val promoCodeId = reference("promo_code_id", foreign = PromoCodeTable).nullable()
     val createdAt = datetime("created_at").defaultExpression(CurrentDateTime)
     val updatedAt = datetime("updated_at").defaultExpression(CurrentDateTime)
 }

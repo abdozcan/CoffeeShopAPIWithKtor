@@ -16,6 +16,7 @@ class OrderEntity(id: EntityID<Int>) : IntEntity(id) {
     var totalAmount by OrderTable.totalAmount
     var shippingAddress by OrderTable.shippingAddress
     var paymentMethod by OrderTable.paymentMethod
+    var promoCodeId by OrderTable.promoCodeId
     var createdAt by OrderTable.createdAt
     var updatedAt by OrderTable.updatedAt
 
@@ -23,7 +24,6 @@ class OrderEntity(id: EntityID<Int>) : IntEntity(id) {
 
     fun toOrder() = Order(
         id = id.value,
-        userId = userId?.value,
         orderDate = orderDate,
         status = status,
         totalAmount = totalAmount,

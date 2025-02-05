@@ -4,19 +4,37 @@ import com.example.data.database.dao.AddressEntity
 import com.example.data.database.table.AddressTable
 import com.example.data.database.table.UserTable
 import com.example.data.utils.doOrThrowIfNull
-import com.example.data.utils.mapOrTrowIfEmpty
 import com.example.data.utils.withTransactionContext
 import com.example.domain.model.Address
 import com.example.domain.repository.AddressRepository
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 class DefaultAddressRepository : AddressRepository {
+    override suspend fun findDefaultByUserId(userId: Int): Result<Address> = runCatching {
+        withTransactionContext {
+            AddressEntity.find(
+                (AddressTable.userId eq userId)
+            ).first {
+                it.isDefault == true
+            }.toAddress()
+        }
+    }
+
     override suspend fun findAllByUserId(userId: Int): Result<List<Address>> = runCatching {
         withTransactionContext {
             AddressEntity.find {
                 AddressTable.userId eq userId
-            }.mapOrTrowIfEmpty {
+            }.map {
                 it.toAddress()
+            }
+        }
+    }
+
+    override suspend fun setDefaultAddress(id: Int): Result<Unit> = runCatching {
+        withTransactionContext {
+            AddressEntity.findByIdAndUpdate(id) {
+                it.isDefault = true
             }
         }
     }

@@ -8,8 +8,6 @@ import java.time.LocalDateTime
 
 @Serializable
 data class OrderRequest(
-    @SerialName("user_id")
-    val userId: Int,
     @SerialName("shipping_address")
     val shippingAddress: String,
     @SerialName("payment_method")
@@ -17,6 +15,10 @@ data class OrderRequest(
     @SerialName("order_date")
     @Serializable(LocalDateTimeSerializer::class)
     val orderDate: LocalDateTime,
+    @SerialName("total_amount")
+    val totalAmount: Double,
+    @SerialName("promo_code_id")
+    val promoCodeId: Int?,
     @SerialName("ordered_products")
     val orderedProducts: List<RequestOrderedProduct>
 )

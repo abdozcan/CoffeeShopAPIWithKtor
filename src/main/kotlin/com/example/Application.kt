@@ -82,9 +82,10 @@ private fun Application.configureRouting(audience: String, issuer: String, secre
     cartRoutes(cartRepo, userRepo, promoCodeRepo)
     favoriteRoutes(favoriteRepo, userRepo)
     reviewRoutes(reviewRepo)
-    orderRoutes(orderRepo)
-    addressRoutes(addressRepo)
+    orderRoutes(orderRepo, userRepo)
+    addressRoutes(addressRepo, userRepo)
     categoryRoutes(categoryRepo)
+    `3DSecureRoutes`()
 }
 
 private fun Application.configureDatabase() {

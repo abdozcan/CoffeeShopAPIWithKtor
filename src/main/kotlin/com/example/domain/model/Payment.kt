@@ -13,6 +13,11 @@ data class Payment(
     @SerialName("payment_date")
     @Serializable(with = LocalDateTimeSerializer::class)
     val paymentDate: LocalDateTime,
-    val amount: Int,
-    val method: String
+    val amount: Double,
+    val method: String,
+    val status: PaymentStatus,
 )
+
+enum class PaymentStatus {
+    PENDING, COMPLETED, FAILED
+}

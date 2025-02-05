@@ -34,6 +34,7 @@ dependencies {
     implementation(libs.exposed.java.time)
     implementation(libs.sqlite.jdbc)
     implementation(libs.ktor.server.status.pages)
+    implementation(libs.ktor.html.builder)
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
 }

@@ -11,4 +11,5 @@ class PromoCodeUsageEntity(id: EntityID<Int>) : IntEntity(id) {
     var userId by PromoCodeUsageTable.userId
     var promoCodeId by PromoCodeUsageTable.promoCodeId
     var used by PromoCodeUsageTable.used
+    var orderId by PromoCodeUsageTable.orderId
 }

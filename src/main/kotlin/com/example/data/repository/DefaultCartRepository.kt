@@ -19,7 +19,7 @@ class DefaultCartRepository : CartRepository {
     override suspend fun findAllByUserId(userId: Int): Result<List<CartItem>> = runCatching {
         withTransactionContext {
             CartItemEntity.find {
-                CartItemTable.userId eq userId
+                (CartItemTable.userId eq userId) and (CartItemTable.status eq CartStatus.ACTIVE)
             }.mapOrTrowIfEmpty {
                 it.toCartItem()
             }
@@ -29,7 +29,7 @@ class DefaultCartRepository : CartRepository {
     override suspend fun add(userId: Int, productId: Int, quantity: Int): Result<Unit> = runCatching {
         withTransactionContext {
             CartItemEntity.find {
-                (CartItemTable.userId eq userId) and (CartItemTable.productId eq productId)
+                (CartItemTable.userId eq userId) and (CartItemTable.productId eq productId) and (CartItemTable.status eq CartStatus.ACTIVE)
             }.firstOrNull()?.let {
                 it.quantity += quantity
                 return@withTransactionContext

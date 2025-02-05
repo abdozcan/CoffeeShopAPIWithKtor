@@ -2,6 +2,8 @@ package com.example.routes
 
 import com.example.domain.model.OrderRequest
 import com.example.domain.repository.OrderRepository
+import com.example.domain.repository.UserRepository
+import com.example.routes.utils.getAuthenticatedUsersId
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.plugins.*
@@ -9,18 +11,18 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Application.orderRoutes(orderRepo: OrderRepository) = routing {
-    authentication {
-        findAllByUserId(orderRepo)
+fun Application.orderRoutes(orderRepo: OrderRepository, userRepo: UserRepository) = routing {
+    authenticate {
+        getAll(orderRepo)
         findById(orderRepo)
         findOrderItemProduct(orderRepo)
         cancel(orderRepo)
         delete(orderRepo)
-        add(orderRepo)
+        add(orderRepo, userRepo)
     }
 }
 
-private fun Route.findAllByUserId(repo: OrderRepository) = get("order/user/{userId?}") {
+private fun Route.getAll(repo: OrderRepository) = get("order/user/{userId?}") {
     call.parameters["userId"]?.toInt()?.let { userId ->
         repo.findAllByUserId(userId).getOrThrow().let { orderList ->
             call.respond(orderList)
@@ -60,16 +62,20 @@ private fun Route.delete(repo: OrderRepository) = delete("order/delete/{id?}") {
     } ?: throw MissingRequestParameterException("ID")
 }
 
-private fun Route.add(repo: OrderRepository) = post("order/add") {
-    call.receive<OrderRequest>().let { order ->
-        repo.add(
-            order.userId,
-            order.shippingAddress,
-            order.paymentMethod,
-            order.orderDate,
-            order.orderedProducts
-        ).getOrThrow().let {
-            call.respond("Order added successfully.")
+private fun Route.add(repo: OrderRepository, userRepo: UserRepository) = post("order/add") {
+    getAuthenticatedUsersId(userRepo = userRepo)?.let { userId ->
+        call.receive<OrderRequest>().let { order ->
+            repo.add(
+                userId,
+                order.shippingAddress,
+                order.paymentMethod,
+                order.orderDate,
+                order.totalAmount,
+                order.promoCodeId,
+                order.orderedProducts
+            ).getOrThrow().let { order ->
+                call.respond(order)
+            }
         }
     }
 }

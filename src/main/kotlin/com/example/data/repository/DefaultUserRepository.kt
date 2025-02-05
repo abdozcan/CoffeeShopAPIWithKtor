@@ -14,8 +14,7 @@ class DefaultUserRepository : UserRepository {
         withTransactionContext {
             UserEntity.find {
                 UserTable.email eq email
-            }.single()
-                .doOrThrowIfNull { it.toUser() }
+            }.single().toUser()
         }
     }
 
@@ -58,14 +57,6 @@ class DefaultUserRepository : UserRepository {
     override suspend fun delete(id: Int): Result<Unit> = runCatching {
         withTransactionContext {
             UserEntity.findById(id).doOrThrowIfNull { it.delete() }
-        }
-    }
-
-    override suspend fun selectDefaultAddress(userId: Int, address: String): Result<User> = runCatching {
-        withTransactionContext {
-            UserEntity.findByIdAndUpdate(userId) {
-                it.defaultAddress = address
-            }.doOrThrowIfNull { it.toUser() }
         }
     }
 }

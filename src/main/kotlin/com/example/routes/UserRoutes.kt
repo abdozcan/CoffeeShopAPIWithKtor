@@ -1,6 +1,5 @@
 package com.example.routes
 
-import com.example.data.utils.Constant.ADDRESS_LENGTH
 import com.example.domain.repository.UserRepository
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -14,7 +13,6 @@ fun Application.userRoutes(userRepo: UserRepository) = routing {
     authenticate {
         getByEmail(userRepo)
         getById(userRepo)
-        setDefaultAddress(userRepo)
         delete(userRepo)
     }
 }
@@ -33,22 +31,6 @@ fun Route.getById(repo: UserRepository) = get("/user/{id?}") {
             call.respond(HttpStatusCode.OK, user)
         }
     } ?: throw MissingRequestParameterException("ID")
-}
-
-fun Route.setDefaultAddress(repo: UserRepository) = post("/user/{userId?}/default-address") {
-    call.parameters["userId"]?.toInt()?.let { userId ->
-        call.receiveText().let { address ->
-            if (address.length > ADDRESS_LENGTH)
-                return@post call.respond(
-                    HttpStatusCode.BadRequest,
-                    "Address length must be less than $ADDRESS_LENGTH."
-                )
-
-            repo.selectDefaultAddress(userId, address).getOrThrow().let { user ->
-                call.respond(HttpStatusCode.OK, user)
-            }
-        }
-    } ?: throw MissingRequestParameterException("user ID")
 }
 
 fun Route.delete(repo: UserRepository) = delete("/user/{id?}") {

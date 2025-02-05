@@ -16,5 +16,4 @@ interface UserRepository {
         phone: String
     ): Result<User>
     suspend fun delete(id: Int): Result<Unit>
-    suspend fun selectDefaultAddress(userId: Int, address: String): Result<User>
 }

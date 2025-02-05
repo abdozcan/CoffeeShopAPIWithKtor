@@ -13,7 +13,7 @@ import io.ktor.server.routing.*
 fun Application.reviewRoutes(reviewRepo: ReviewRepository) = routing {
     route("/review") {
         getAllByProductId(reviewRepo)
-        getAllByUserId(reviewRepo)
+        getAll(reviewRepo)
         add(reviewRepo)
         edit(reviewRepo)
         delete(reviewRepo)
@@ -28,7 +28,7 @@ fun Route.getAllByProductId(repo: ReviewRepository) = route("/product") {
     }
 }
 
-fun Route.getAllByUserId(repo: ReviewRepository) = route("/user") {
+fun Route.getAll(repo: ReviewRepository) = route("/user") {
     getBy<ReviewSortOption> { id, limit, offset, sortOption ->
         repo.findAllByUserId(id, limit, offset, sortOption).getOrThrow().let { reviewList ->
             call.respond(reviewList)

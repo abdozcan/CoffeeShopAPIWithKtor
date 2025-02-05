@@ -13,12 +13,17 @@ class PaymentEntity(id: EntityID<Int>) : IntEntity(id) {
     var paymentDate by PaymentTable.paymentDate
     var amount by PaymentTable.amount
     var method by PaymentTable.method
+    var status by PaymentTable.status
+    var transactionId by PaymentTable.transactionId
+    var createdAt by PaymentTable.createdAt
+    var updatedAt by PaymentTable.updatedAt
 
     fun toPayment() = Payment(
         id = id.value,
         orderId = orderId.value,
         paymentDate = paymentDate,
         amount = amount,
-        method = method
+        method = method,
+        status = status
     )
 }

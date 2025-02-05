@@ -1,15 +1,10 @@
 package com.example.data.repository
 
-import com.example.data.database.dao.CartItemEntity
-import com.example.data.database.dao.OrderEntity
-import com.example.data.database.dao.OrderItemEntity
-import com.example.data.database.dao.ProductEntity
-import com.example.data.database.table.CartItemTable
-import com.example.data.database.table.OrderItemTable
-import com.example.data.database.table.OrderTable
-import com.example.data.database.table.UserTable
+import com.example.data.database.dao.*
+import com.example.data.database.table.*
 import com.example.data.utils.*
 import com.example.domain.model.Order
+import com.example.domain.model.PaymentStatus
 import com.example.domain.repository.OrderRepository
 import com.example.domain.repository.ProductOfOrderItem
 import com.example.domain.repository.RequestOrderedProduct
@@ -58,18 +53,30 @@ class DefaultOrderRepository : OrderRepository {
         shippingAddress: String,
         paymentMethod: String,
         orderDate: LocalDateTime,
+        totalAmount: Double,
+        promoCodeId: Int?,
         orderedProducts: List<RequestOrderedProduct>
     ): Result<Order> = runCatching {
         withTransactionContext {
             val order = OrderEntity.new {
                 this.userId = EntityID(userId, UserTable)
                 this.orderDate = orderDate
-                this.totalAmount = orderedProducts.sumOf { it.price * it.quantity }
+                this.totalAmount = totalAmount
                 this.status = OrderStatus.PENDING
                 this.shippingAddress = shippingAddress
                 this.paymentMethod = paymentMethod
+                this.promoCodeId = promoCodeId?.let { EntityID(it, PromoCodeTable) }
                 this.createdAt = LocalDateTime.now()
                 this.updatedAt = LocalDateTime.now()
+            }
+
+            promoCodeId?.let { promoCodeId ->
+                PromoCodeUsageEntity.new {
+                    this.userId = EntityID(userId, UserTable)
+                    this.orderId = order.id
+                    this.used = true
+                    this.promoCodeId = EntityID(promoCodeId, PromoCodeTable)
+                }
             }
 
             orderedProducts.forEach { product ->
@@ -82,6 +89,17 @@ class DefaultOrderRepository : OrderRepository {
                     this.price = product.price
                 }
                 setCartItemStatusCompleted(userId, product.id)
+            }
+
+            PaymentEntity.new {
+                this.orderId = order.id
+                this.paymentDate = LocalDateTime.now()
+                this.amount = totalAmount
+                this.method = paymentMethod
+                this.status = PaymentStatus.PENDING
+                this.transactionId = "BANK_TRANSACTION_ID"
+                this.createdAt = LocalDateTime.now()
+                this.updatedAt = LocalDateTime.now()
             }
 
             order.toOrder()
@@ -111,7 +129,7 @@ class DefaultOrderRepository : OrderRepository {
 
     private fun setCartItemStatusCompleted(userId: Int, productId: Int) {
         CartItemEntity.find {
-            (CartItemTable.userId eq userId) and (CartItemTable.productId eq productId)
+            (CartItemTable.userId eq userId) and (CartItemTable.productId eq productId) and (CartItemTable.status eq CartStatus.ACTIVE)
         }.firstOrNull().doOrThrowIfNull {
             it.status = CartStatus.COMPLETED
         }

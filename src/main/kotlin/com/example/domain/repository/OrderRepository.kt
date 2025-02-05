@@ -16,6 +16,8 @@ interface OrderRepository {
         shippingAddress: String,
         paymentMethod: String,
         orderDate: LocalDateTime,
+        totalAmount: Double,
+        promoCodeId: Int?,
         orderedProducts: List<RequestOrderedProduct>
     ): Result<Order>
 }

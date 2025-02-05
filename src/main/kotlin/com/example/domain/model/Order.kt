@@ -9,8 +9,6 @@ import java.time.LocalDateTime
 @Serializable
 data class Order(
     val id: Int,
-    @SerialName("user_id")
-    val userId: Int?,
     @SerialName("order_date")
     @Serializable(with = LocalDateTimeSerializer::class)
     val orderDate: LocalDateTime,

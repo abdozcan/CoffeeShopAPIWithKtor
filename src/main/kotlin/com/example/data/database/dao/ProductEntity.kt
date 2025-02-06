@@ -60,7 +60,8 @@ class ProductEntity(id: EntityID<Int>) : IntEntity(id) {
         stockQuantity = stockQuantity,
         popularityRating = popularityRating,
         discountPrice = discountPrice,
-        discountPercentage = discountPercentage
+        discountPercentage = discountPercentage,
+        reviewsCount = reviews.count()
     )
 
     fun toSearchResultProductInfo() = SearchResultProductInfo(

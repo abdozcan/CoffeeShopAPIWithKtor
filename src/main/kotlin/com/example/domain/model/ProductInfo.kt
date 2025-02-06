@@ -18,5 +18,7 @@ data class ProductInfo(
     @SerialName("discount_price")
     val discountPrice: Double?,
     @SerialName("discount_percentage")
-    val discountPercentage: Double?
+    val discountPercentage: Double?,
+    @SerialName("reviews_count")
+    val reviewsCount: Long
 )

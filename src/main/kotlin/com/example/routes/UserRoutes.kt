@@ -1,6 +1,7 @@
 package com.example.routes
 
 import com.example.domain.repository.UserRepository
+import com.example.routes.utils.getAuthenticatedUsersId
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -11,9 +12,18 @@ import io.ktor.server.routing.*
 
 fun Application.userRoutes(userRepo: UserRepository) = routing {
     authenticate {
+        getName(userRepo)
         getByEmail(userRepo)
         getById(userRepo)
         delete(userRepo)
+    }
+}
+
+fun Route.getName(repo: UserRepository) = get("/user/name") {
+    getAuthenticatedUsersId(repo)?.let { userId ->
+        repo.findById(userId).getOrThrow().let { user ->
+            call.respond(HttpStatusCode.OK, mapOf("name" to user.name))
+        }
     }
 }
 

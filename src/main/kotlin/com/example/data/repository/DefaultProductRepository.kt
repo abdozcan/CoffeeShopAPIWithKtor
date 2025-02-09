@@ -3,7 +3,6 @@ package com.example.data.repository
 import com.example.data.database.dao.ProductEntity
 import com.example.data.database.table.ProductTable
 import com.example.data.utils.doOrThrowIfNull
-import com.example.data.utils.mapOrTrowIfEmpty
 import com.example.data.utils.withTransactionContext
 import com.example.domain.model.Product
 import com.example.domain.model.ProductInfo
@@ -20,7 +19,7 @@ class DefaultProductRepository : ProductRepository {
     override suspend fun all(limit: Int, offset: Long, sortOption: ProductSortOption): Result<List<ProductInfo>> =
         runCatching {
             withTransactionContext {
-                ProductEntity.all().limit(limit, offset).sortBy(sortOption).mapOrTrowIfEmpty { it.toProductInfo() }
+                ProductEntity.all().limit(limit, offset).sortBy(sortOption).map { it.toProductInfo() }
             }
         }
 
@@ -40,7 +39,7 @@ class DefaultProductRepository : ProductRepository {
             withTransactionContext {
                 ProductEntity.find {
                     ProductTable.category eq category
-                }.limit(limit, offset).sortBy(sortOption).mapOrTrowIfEmpty {
+                }.limit(limit, offset).sortBy(sortOption).map {
                     it.toProductInfo()
                 }
             }
@@ -55,7 +54,7 @@ class DefaultProductRepository : ProductRepository {
             withTransactionContext {
                 ProductEntity.find {
                     ProductTable.isBestseller eq true
-                }.limit(limit, offset).sortBy(sortOption).mapOrTrowIfEmpty {
+                }.limit(limit, offset).sortBy(sortOption).map {
                     it.toProductInfo()
                 }
             }
@@ -69,7 +68,7 @@ class DefaultProductRepository : ProductRepository {
             ProductEntity.all()
                 .orderBy(ProductTable.popularityRating to SortOrder.DESC)
                 .limit(limit, offset)
-                .mapOrTrowIfEmpty {
+                .map {
                     it.toProductInfo()
                 }
         }
@@ -83,7 +82,7 @@ class DefaultProductRepository : ProductRepository {
             ProductEntity.all()
                 .orderBy(ProductTable.id to SortOrder.DESC)
                 .limit(limit, offset)
-                .mapOrTrowIfEmpty {
+                .map {
                     it.toProductInfo()
                 }
         }
@@ -93,7 +92,7 @@ class DefaultProductRepository : ProductRepository {
         withTransactionContext {
             ProductEntity.find {
                 ProductTable.discountPrice neq null
-            }.limit(limit, offset).mapOrTrowIfEmpty {
+            }.limit(limit, offset).map {
                 it.toProductInfo()
             }
         }
@@ -112,7 +111,7 @@ class DefaultProductRepository : ProductRepository {
                     .and(ProductTable.price lessEq request.maxPrice)
             }.limit(request.limit, offset)
                 .sortBy(request.sort)
-                .mapOrTrowIfEmpty { it.toSearchResultProductInfo() }
+                .map { it.toSearchResultProductInfo() }
         }
     }
 }

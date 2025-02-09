@@ -2,7 +2,10 @@ package com.example.data.repository
 
 import com.example.data.database.dao.*
 import com.example.data.database.table.*
-import com.example.data.utils.*
+import com.example.data.utils.CartStatus
+import com.example.data.utils.OrderStatus
+import com.example.data.utils.doOrThrowIfNull
+import com.example.data.utils.withTransactionContext
 import com.example.domain.model.Order
 import com.example.domain.model.PaymentStatus
 import com.example.domain.repository.OrderRepository
@@ -18,7 +21,7 @@ class DefaultOrderRepository : OrderRepository {
         withTransactionContext {
             OrderEntity.find {
                 OrderTable.userId eq userId
-            }.mapOrTrowIfEmpty {
+            }.map {
                 it.toOrder()
             }
         }
@@ -35,7 +38,7 @@ class DefaultOrderRepository : OrderRepository {
             OrderItemEntity.find {
                 OrderItemTable.orderId eq orderId
             }.with(OrderItemEntity::product)
-                .mapOrTrowIfEmpty {
+                .map {
                     ProductOfOrderItem(
                         productId = it.product.id.value,
                         name = it.product.name,

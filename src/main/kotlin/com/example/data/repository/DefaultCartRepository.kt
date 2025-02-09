@@ -7,7 +7,6 @@ import com.example.data.database.table.UserTable
 import com.example.data.utils.CartStatus
 import com.example.data.utils.Constant.CART_ITEM_EXPIRATION_HOURS
 import com.example.data.utils.doOrThrowIfNull
-import com.example.data.utils.mapOrTrowIfEmpty
 import com.example.data.utils.withTransactionContext
 import com.example.domain.model.CartItem
 import com.example.domain.repository.CartRepository
@@ -20,7 +19,7 @@ class DefaultCartRepository : CartRepository {
         withTransactionContext {
             CartItemEntity.find {
                 (CartItemTable.userId eq userId) and (CartItemTable.status eq CartStatus.ACTIVE)
-            }.mapOrTrowIfEmpty {
+            }.map {
                 it.toCartItem()
             }
         }
@@ -48,7 +47,7 @@ class DefaultCartRepository : CartRepository {
 
     override suspend fun delete(ids: List<Int>): Result<Unit> = runCatching {
         withTransactionContext {
-            CartItemEntity.forIds(ids).mapOrTrowIfEmpty { it.delete() }
+            CartItemEntity.forIds(ids).map { it.delete() }
         }
     }
 }

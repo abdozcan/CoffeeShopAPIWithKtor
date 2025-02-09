@@ -22,7 +22,6 @@ fun Application.productRoutes(productRepo: ProductRepository, userRepo: UserRepo
         getPopular(productRepo)
         getNewest(productRepo)
         getSpecialOffer(productRepo)
-        getFavoriteByUserId(productRepo)
         search(productRepo)
     }
 }
@@ -97,16 +96,6 @@ fun Route.getSpecialOffer(repo: ProductRepository) = get("/special_offer/limit/{
             }
         } ?: throw MissingRequestParameterException("page")
     } ?: throw MissingRequestParameterException("limit")
-}
-
-fun Route.getFavoriteByUserId(repo: ProductRepository) = authenticate {
-    route("/favorite") {
-        getBy<ProductSortOption> { id, limit, offset, sortOption ->
-            repo.findFavoriteProduct(id, limit, offset, sortOption).getOrThrow().let { productList ->
-                call.respond(productList)
-            }
-        }
-    }
 }
 
 fun Route.search(repo: ProductRepository) = post("/search") {

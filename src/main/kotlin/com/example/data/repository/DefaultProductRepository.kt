@@ -1,8 +1,6 @@
 package com.example.data.repository
 
-import com.example.data.database.dao.FavoriteEntity
 import com.example.data.database.dao.ProductEntity
-import com.example.data.database.table.FavoriteTable
 import com.example.data.database.table.ProductTable
 import com.example.data.utils.doOrThrowIfNull
 import com.example.data.utils.mapOrTrowIfEmpty
@@ -100,23 +98,6 @@ class DefaultProductRepository : ProductRepository {
             }
         }
     }
-
-    override suspend fun findFavoriteProduct(
-        userId: Int,
-        limit: Int,
-        offset: Long,
-        sortOption: ProductSortOption
-    ): Result<List<ProductInfo>> =
-        runCatching {
-            withTransactionContext {
-                FavoriteEntity.find { FavoriteTable.userId eq userId }.limit(limit, offset).sortBy(sortOption)
-                    .mapOrTrowIfEmpty { favoriteProduct ->
-                        ProductEntity.findById(favoriteProduct.productId.value).doOrThrowIfNull { product ->
-                            product.toProductInfo()
-                        }
-                    }
-            }
-        }
 
     override suspend fun search(request: SearchRequest): Result<List<SearchResultProductInfo>> = runCatching {
         val offset = (request.page - 1) * request.limit

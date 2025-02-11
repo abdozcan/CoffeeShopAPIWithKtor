@@ -6,10 +6,14 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class OrderItem(
     val id: Int,
-    @SerialName("order_id")
-    val orderId: Int,
     @SerialName("product_id")
     val productId: Int,
+    val name: String,
     val quantity: Int,
-    val price: Double
+    val weight: Int,
+    val price: Double,
+    @SerialName(value = "discount_price")
+    val discountPrice: Double?,
+    @SerialName("image_url")
+    val imageUrl: String
 )

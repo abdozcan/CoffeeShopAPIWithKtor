@@ -16,9 +16,12 @@ class OrderItemEntity(id: EntityID<Int>) : IntEntity(id) {
 
     fun toOrderItem() = OrderItem(
         id = id.value,
-        orderId = orderId.value,
+        name = product.name,
+        weight = product.weight,
         productId = product.id.value,
         quantity = quantity,
-        price = price
+        price = price,
+        discountPrice = product.discountPrice,
+        imageUrl = product.imageUrl
     )
 }

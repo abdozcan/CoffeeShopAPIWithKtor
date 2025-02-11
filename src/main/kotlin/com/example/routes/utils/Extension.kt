@@ -1,6 +1,7 @@
 package com.example.routes.utils
 
 import com.example.domain.repository.UserRepository
+import com.example.domain.utils.OrderSortOption
 import com.example.domain.utils.ProductSortOption
 import com.example.domain.utils.ReviewSortOption
 import com.example.domain.utils.SortOption
@@ -30,6 +31,7 @@ inline fun <reified T : SortOption> Route.getBy(
                 val sortOption = when (T::class) {
                     ProductSortOption::class -> ProductSortOption.valueOf(sort ?: ProductSortOption.DATE_DESC.name) as T
                     ReviewSortOption::class -> ReviewSortOption.valueOf(sort ?: ReviewSortOption.DATE_DESC.name) as T
+                    OrderSortOption::class -> OrderSortOption.valueOf(sort ?: OrderSortOption.DATE_DESC.name) as T
                     else -> throw IllegalArgumentException("Unsupported SortOption type")
                 }
 

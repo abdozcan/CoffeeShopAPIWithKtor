@@ -11,19 +11,28 @@ import com.example.domain.model.PaymentStatus
 import com.example.domain.repository.OrderRepository
 import com.example.domain.repository.ProductOfOrderItem
 import com.example.domain.repository.RequestOrderedProduct
+import com.example.domain.utils.OrderSortOption
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.with
+import org.jetbrains.exposed.sql.SizedIterable
+import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.and
 import java.time.LocalDateTime
 
 class DefaultOrderRepository : OrderRepository {
-    override suspend fun findAllByUserId(userId: Int): Result<List<Order>> = runCatching {
+    override suspend fun findAllByUserId(
+        userId: Int,
+        limit: Int,
+        offset: Long,
+        sortOption: OrderSortOption
+    ): Result<List<Order>> = runCatching {
         withTransactionContext {
-            OrderEntity.find {
-                OrderTable.userId eq userId
-            }.map {
-                it.toOrder()
-            }
+            OrderEntity.find { OrderTable.userId eq userId }
+                .limit(limit, offset)
+                .sortBy(sortOption)
+                .map {
+                    it.toOrder()
+                }
         }
     }
 
@@ -138,3 +147,12 @@ class DefaultOrderRepository : OrderRepository {
         }
     }
 }
+
+fun <T> SizedIterable<T>.sortBy(sort: OrderSortOption): SizedIterable<T> =
+    orderBy(
+        when (sort) {
+            OrderSortOption.DATE_DESC -> OrderTable.orderDate to SortOrder.DESC
+            OrderSortOption.DATE_ASC -> OrderTable.orderDate to SortOrder.ASC
+            OrderSortOption.STATUS -> OrderTable.status to SortOrder.ASC
+        }
+    )

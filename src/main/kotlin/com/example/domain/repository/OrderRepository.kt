@@ -1,12 +1,18 @@
 package com.example.domain.repository
 
 import com.example.domain.model.Order
+import com.example.domain.utils.OrderSortOption
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 
 interface OrderRepository {
-    suspend fun findAllByUserId(userId: Int): Result<List<Order>>
+    suspend fun findAllByUserId(
+        userId: Int,
+        limit: Int,
+        offset: Long,
+        sortOption: OrderSortOption
+    ): Result<List<Order>>
     suspend fun findById(id: Int): Result<Order>
     suspend fun findOrderItemProduct(orderId: Int): Result<List<ProductOfOrderItem>>
     suspend fun cancel(orderId: Int): Result<Unit>

@@ -1,53 +1,64 @@
 package com.example.routes
 
-import com.example.domain.model.Review
+import com.example.domain.model.EditReviewRequest
+import com.example.domain.model.ReviewRequest
 import com.example.domain.repository.ReviewRepository
+import com.example.domain.repository.UserRepository
 import com.example.domain.utils.ReviewSortOption
+import com.example.routes.utils.getAuthenticatedUsersId
 import com.example.routes.utils.getBy
+import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Application.reviewRoutes(reviewRepo: ReviewRepository) = routing {
+fun Application.reviewRoutes(reviewRepo: ReviewRepository, userRepo: UserRepository) = routing {
     route("/review") {
         getAllByProductId(reviewRepo)
-        getAll(reviewRepo)
-        add(reviewRepo)
-        edit(reviewRepo)
-        delete(reviewRepo)
+        authenticate {
+            getAllByUserId(reviewRepo, userRepo)
+            add(reviewRepo, userRepo)
+            edit(reviewRepo)
+            delete(reviewRepo)
+        }
     }
 }
 
-fun Route.getAllByProductId(repo: ReviewRepository) = route("/product") {
+fun Route.getAllByProductId(reviewRepo: ReviewRepository) = route("/product") {
     getBy<ReviewSortOption> { id, limit, offset, sortOption ->
-        repo.findAllByProductId(id, limit, offset, sortOption).getOrThrow().let { reviewList ->
+        reviewRepo.findAllByProductId(id, limit, offset, sortOption).getOrThrow().let { reviewList ->
             call.respond(reviewList)
         }
     }
 }
 
-fun Route.getAll(repo: ReviewRepository) = route("/user") {
-    getBy<ReviewSortOption> { id, limit, offset, sortOption ->
-        repo.findAllByUserId(id, limit, offset, sortOption).getOrThrow().let { reviewList ->
-            call.respond(reviewList)
+fun Route.getAllByUserId(reviewRepo: ReviewRepository, userRepo: UserRepository) = route("/user") {
+    getBy<ReviewSortOption> { limit, offset, sortOption ->
+        getAuthenticatedUsersId(userRepo)?.let { userId ->
+            reviewRepo.findAllByUserId(userId, limit, offset, sortOption).getOrThrow().let { reviewList ->
+                call.respond(reviewList)
+            }
         }
     }
 }
 
-fun Route.add(repo: ReviewRepository) = post("/add") {
-    call.receive<Review>().let { review ->
-        repo.add(review).getOrThrow().let {
-            call.respond("Review added successfully.")
+fun Route.add(reviewRepo: ReviewRepository, userRepo: UserRepository) = post("/add") {
+    getAuthenticatedUsersId(userRepo)?.let { userId ->
+        call.receive<ReviewRequest>().let { reviewRequest ->
+            reviewRepo.add(reviewRequest, userId).getOrThrow().let { review ->
+                call.respond(review)
+            }
         }
     }
 }
 
 fun Route.edit(repo: ReviewRepository) = put("/edit") {
-    call.receive<Review>().let { review ->
+    call.receive<EditReviewRequest>().let { review ->
         repo.edit(review).getOrThrow().let {
-            call.respond("Review edited successfully.")
+            call.respond(HttpStatusCode.OK, "Review edited successfully.")
         }
     }
 }

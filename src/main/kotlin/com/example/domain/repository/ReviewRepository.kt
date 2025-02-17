@@ -1,6 +1,8 @@
 package com.example.domain.repository
 
+import com.example.domain.model.EditReviewRequest
 import com.example.domain.model.Review
+import com.example.domain.model.ReviewRequest
 import com.example.domain.utils.ReviewSortOption
 
 interface ReviewRepository {
@@ -17,7 +19,7 @@ interface ReviewRepository {
         offset: Long,
         sort: ReviewSortOption
     ): Result<List<Review>>
-    suspend fun add(review: Review): Result<Unit>
-    suspend fun edit(review: Review): Result<Unit>
+    suspend fun add(review: ReviewRequest, userId: Int): Result<Review>
+    suspend fun edit(review: EditReviewRequest): Result<Unit>
     suspend fun delete(id: Int): Result<Unit>
 }

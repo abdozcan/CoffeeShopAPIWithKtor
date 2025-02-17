@@ -31,6 +31,6 @@ class OrderEntity(id: EntityID<Int>) : IntEntity(id) {
         paymentMethod = paymentMethod,
         createdAt = createdAt,
         updatedAt = updatedAt,
-        orderItems = orderItems.map { it.toOrderItem() }
+        orderItems = orderItems.map { it.toOrderItem(userId?.value) }
     )
 }

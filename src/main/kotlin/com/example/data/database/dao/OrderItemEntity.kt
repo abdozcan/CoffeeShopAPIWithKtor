@@ -14,7 +14,7 @@ class OrderItemEntity(id: EntityID<Int>) : IntEntity(id) {
     var quantity by OrderItemTable.quantity
     var price by OrderItemTable.price
 
-    fun toOrderItem() = OrderItem(
+    fun toOrderItem(userId: Int?) = OrderItem(
         id = id.value,
         name = product.name,
         weight = product.weight,
@@ -22,6 +22,7 @@ class OrderItemEntity(id: EntityID<Int>) : IntEntity(id) {
         quantity = quantity,
         price = price,
         discountPrice = product.discountPrice,
-        imageUrl = product.imageUrl
+        imageUrl = product.imageUrl,
+        review = product.reviews.find { it.userId?.value == userId }?.toReview()
     )
 }

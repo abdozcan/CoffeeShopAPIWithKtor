@@ -15,5 +15,6 @@ data class OrderItem(
     @SerialName(value = "discount_price")
     val discountPrice: Double?,
     @SerialName("image_url")
-    val imageUrl: String
+    val imageUrl: String,
+    val review: Review? = null
 )

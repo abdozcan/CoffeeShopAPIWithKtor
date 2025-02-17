@@ -15,12 +15,14 @@ class ReviewEntity(id: EntityID<Int>) : IntEntity(id) {
     var comment by ReviewTable.comment
     var reviewDate by ReviewTable.reviewDate
 
+    val user by UserEntity referencedOn ReviewTable
+
     fun toReview() = Review(
         id = id.value,
         productId = productId.value,
-        userId = userId?.value,
+        userName = user.name,
         rating = rating,
         comment = comment,
-        reviewDate = reviewDate
+        reviewDate = reviewDate,
     )
 }

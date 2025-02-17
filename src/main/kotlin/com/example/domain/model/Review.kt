@@ -10,8 +10,8 @@ data class Review(
     val id: Int,
     @SerialName("product_id")
     val productId: Int,
-    @SerialName("user_id")
-    val userId: Int?,
+    @SerialName("user_name")
+    val userName: String,
     val rating: Int,
     val comment: String,
     @SerialName("review_date")

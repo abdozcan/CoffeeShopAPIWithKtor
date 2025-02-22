@@ -15,9 +15,7 @@ class DefaultAddressRepository : AddressRepository {
         withTransactionContext {
             AddressEntity.find(
                 (AddressTable.userId eq userId)
-            ).first {
-                it.isDefault == true
-            }.toAddress()
+            ).first { it.isDefault }.toAddress()
         }
     }
 
@@ -33,9 +31,8 @@ class DefaultAddressRepository : AddressRepository {
 
     override suspend fun setDefaultAddress(id: Int): Result<Unit> = runCatching {
         withTransactionContext {
-            AddressEntity.findByIdAndUpdate(id) {
-                it.isDefault = true
-            }
+            AddressEntity.findSingleByAndUpdate(AddressTable.isDefault eq true) { it.isDefault = false }
+            AddressEntity.findByIdAndUpdate(id) { it.isDefault = true }
         }
     }
 
@@ -45,6 +42,7 @@ class DefaultAddressRepository : AddressRepository {
                 this.name = name
                 this.userId = EntityID(userId, UserTable)
                 this.address = address
+                this.isDefault = false
             }.toAddress()
         }
     }

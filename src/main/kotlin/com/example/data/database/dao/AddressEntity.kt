@@ -17,6 +17,7 @@ class AddressEntity(id: EntityID<Int>) : IntEntity(id) {
     fun toAddress() = Address(
         id = id.value,
         name = name,
-        address = address
+        address = address,
+        isDefault = isDefault
     )
 }

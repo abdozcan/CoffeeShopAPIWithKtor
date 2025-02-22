@@ -74,6 +74,7 @@ private fun Application.configureRouting(audience: String, issuer: String, secre
     val orderRepo: OrderRepository = DefaultOrderRepository()
     val categoryRepo: CategoryRepository = DefaultCategoryRepository()
     val promoCodeRepo: PromoCodeRepository = DefaultPromoCodeRepository()
+    val faqRepo: FaqRepository = DefaultFaqRepository()
 
 
     productRoutes(productRepo, userRepo)
@@ -86,6 +87,7 @@ private fun Application.configureRouting(audience: String, issuer: String, secre
     addressRoutes(addressRepo, userRepo)
     categoryRoutes(categoryRepo)
     `3DSecureRoutes`()
+    faqRoutes(faqRepo)
 }
 
 private fun Application.configureDatabase() {

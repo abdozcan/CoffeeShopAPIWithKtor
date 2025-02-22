@@ -8,6 +8,8 @@ import java.time.LocalDateTime
 @Serializable
 data class Review(
     val id: Int,
+    @SerialName("order_id")
+    val orderId: Int,
     @SerialName("product_id")
     val productId: Int,
     @SerialName("user_name")

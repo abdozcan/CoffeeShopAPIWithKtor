@@ -2,6 +2,7 @@ package com.example.data.repository
 
 import com.example.data.database.dao.ProductEntity
 import com.example.data.database.dao.ReviewEntity
+import com.example.data.database.table.OrderTable
 import com.example.data.database.table.ProductTable
 import com.example.data.database.table.ReviewTable
 import com.example.data.database.table.UserTable
@@ -10,6 +11,7 @@ import com.example.data.utils.withTransactionContext
 import com.example.domain.model.EditReviewRequest
 import com.example.domain.model.Review
 import com.example.domain.model.ReviewRequest
+import com.example.domain.model.ReviewWithProductInfos
 import com.example.domain.repository.ReviewRepository
 import com.example.domain.utils.ReviewSortOption
 import org.jetbrains.exposed.dao.id.EntityID
@@ -34,17 +36,23 @@ class DefaultReviewRepository : ReviewRepository {
             }
         }
 
+    override suspend fun findAllByOrderId(orderId: Int, userId: Int): Result<List<Review>> = runCatching {
+        withTransactionContext {
+            ReviewEntity.find { ReviewTable.orderId eq orderId }.map { it.toReview() }
+        }
+    }
+
     override suspend fun findAllByUserId(
         userId: Int,
         limit: Int,
         offset: Long,
         sort: ReviewSortOption
-    ): Result<List<Review>> = runCatching {
+    ): Result<List<ReviewWithProductInfos>> = runCatching {
         withTransactionContext {
             ReviewEntity.find {
                 ReviewTable.userId eq userId
             }.limit(limit, offset).sortBy(sort).map {
-                it.toReview()
+                it.toReviewWithProductInfos()
             }
         }
     }
@@ -57,6 +65,7 @@ class DefaultReviewRepository : ReviewRepository {
             }
 
             ReviewEntity.new {
+                this.orderId = EntityID(review.orderId, OrderTable)
                 this.productId = EntityID(review.productId, ProductTable)
                 this.userId = EntityID(userId, UserTable)
                 this.rating = review.rating

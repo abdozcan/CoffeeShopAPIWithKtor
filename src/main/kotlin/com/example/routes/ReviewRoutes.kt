@@ -19,6 +19,7 @@ fun Application.reviewRoutes(reviewRepo: ReviewRepository, userRepo: UserReposit
     route("/review") {
         getAllByProductId(reviewRepo)
         authenticate {
+            getAllByOrderId(reviewRepo, userRepo)
             getAllByUserId(reviewRepo, userRepo)
             add(reviewRepo, userRepo)
             edit(reviewRepo)
@@ -32,6 +33,16 @@ fun Route.getAllByProductId(reviewRepo: ReviewRepository) = route("/product") {
         reviewRepo.findAllByProductId(id, limit, offset, sortOption).getOrThrow().let { reviewList ->
             call.respond(reviewList)
         }
+    }
+}
+
+fun Route.getAllByOrderId(reviewRepo: ReviewRepository, userRepo: UserRepository) = get("/order/{orderId?}") {
+    getAuthenticatedUsersId(userRepo)?.let { userId ->
+        call.parameters["orderId"]?.toInt()?.let { orderId ->
+            reviewRepo.findAllByOrderId(orderId, userId).getOrThrow().let { review ->
+                call.respond(review)
+            }
+        } ?: throw MissingRequestParameterException("Order ID")
     }
 }
 

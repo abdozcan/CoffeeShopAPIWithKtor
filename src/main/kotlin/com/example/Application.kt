@@ -110,7 +110,9 @@ private fun Application.configureDatabase() {
                 PaymentTable,
                 PromotionTable,
                 PromoCodeTable,
-                PromoCodeUsageTable
+                PromoCodeUsageTable,
+                FaqTable,
+                FaqTranslationTable
             )
         }
     }

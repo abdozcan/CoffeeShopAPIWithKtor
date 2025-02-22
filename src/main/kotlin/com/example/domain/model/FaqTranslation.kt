@@ -12,5 +12,5 @@ data class FaqTranslation(
     val languageCode: String,
     val question: String,
     val answer: String,
-    val category: String?
+    val category: String
 )

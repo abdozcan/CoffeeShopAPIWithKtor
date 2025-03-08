@@ -15,5 +15,7 @@ interface UserRepository {
         email: String,
         phone: String
     ): Result<User>
+    suspend fun edit(user: User): Result<Unit>
     suspend fun delete(id: Int): Result<Unit>
+    suspend fun changePassword(userId: Int, oldPassword: String, newPassword: String): Result<Unit>
 }

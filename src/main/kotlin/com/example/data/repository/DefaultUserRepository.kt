@@ -54,9 +54,29 @@ class DefaultUserRepository : UserRepository {
         }
     }
 
+    override suspend fun edit(user: User): Result<Unit> = runCatching {
+        withTransactionContext {
+            UserEntity.findByIdAndUpdate(user.id) {
+                it.name = user.name
+                it.email = user.email
+                it.phone = user.phone
+            }
+        }
+    }
+
     override suspend fun delete(id: Int): Result<Unit> = runCatching {
         withTransactionContext {
             UserEntity.findById(id).doOrThrowIfNull { it.delete() }
         }
     }
+
+    override suspend fun changePassword(userId: Int, oldPassword: String, newPassword: String): Result<Unit> =
+        runCatching {
+            withTransactionContext {
+                UserEntity.findByIdAndUpdate(userId) {
+                    if (it.password == oldPassword) it.password = newPassword
+                    else throw IllegalArgumentException("Old password is incorrect")
+                }
+            }
+        }
 }

@@ -20,10 +20,19 @@ fun Application.cartRoutes(
     promoCodeRepo: PromoCodeRepository
 ) = routing {
     authenticate {
+        getItemsSize(cartRepo, userRepo)
         getAll(cartRepo, userRepo)
         add(cartRepo, userRepo)
         delete(cartRepo)
         applyPromoCode(promoCodeRepo, userRepo)
+    }
+}
+
+private fun Route.getItemsSize(repo: CartRepository, userRepo: UserRepository) = get("/cart/items_size") {
+    getAuthenticatedUsersId(userRepo = userRepo)?.let { userId ->
+        repo.findAllByUserId(userId).getOrThrow().size.let { size ->
+            call.respond(HttpStatusCode.OK, size)
+        }
     }
 }
 

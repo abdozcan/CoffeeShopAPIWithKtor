@@ -1,8 +1,8 @@
-
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktor)
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.21"
+    alias(libs.plugins.serialization)
+    alias(libs.plugins.inspektor)
 }
 
 group = "com.example"
@@ -15,26 +15,36 @@ application {
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
 
+swagger {
+    documentation {
+        generateRequestSchemas = true
+        info {
+            title = "Ktor Server Title"
+            description = "Ktor Server Description"
+            version = "1.0"
+            contact {
+                name = "Inspektor"
+                url = "https://github.com/tabilzad/ktor-docs-plugin"
+            }
+        }
+    }
+
+    pluginOptions {
+        format = "yaml" // or json
+    }
+}
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation(libs.ktor.server.content.negotiation)
-    implementation(libs.ktor.server.core)
-    implementation(libs.ktor.serialization.kotlinx.json)
-    implementation(libs.ktor.server.auth)
-    implementation(libs.ktor.server.auth.jwt)
-    implementation(libs.ktor.server.netty)
+    implementation(libs.bundles.ktor)
+    implementation(libs.bundles.exposed)
     implementation(libs.logback.classic)
-    implementation(libs.ktor.server.config.yaml)
-    implementation(libs.exposed.core)
-    implementation(libs.exposed.dao)
-    implementation(libs.exposed.jdbc)
-    implementation(libs.exposed.java.time)
     implementation(libs.sqlite.jdbc)
-    implementation(libs.ktor.server.status.pages)
-    implementation(libs.ktor.html.builder)
+    implementation(libs.smiley4.ktor.swagger)
+    implementation(libs.smiley4.ktor.openapi)
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
 }

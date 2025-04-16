@@ -9,6 +9,7 @@ import com.example.data.database.table.*
 import com.example.data.repository.*
 import com.example.domain.repository.*
 import com.example.routes.*
+import io.github.tabilzad.ktor.annotations.GenerateOpenApi
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -17,8 +18,11 @@ import io.ktor.server.auth.jwt.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.*
 import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.openapi.*
 import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.plugins.swagger.*
 import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import kotlinx.coroutines.launch
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
@@ -34,9 +38,9 @@ fun Application.module() {
     configureDatabase()
     val (audience, issuer, secret) = configureSecurity()
     configureStatusPages()
+    configureOpenAPIRouting()
     configureRouting(audience, issuer, secret)
 }
-
 
 private fun Application.configureStatusPages() = install(StatusPages) {
     exception<Throwable> { call, cause ->
@@ -63,6 +67,16 @@ private fun Application.configureStatusPages() = install(StatusPages) {
     }
 }
 
+private fun Application.configureOpenAPIRouting() {
+    routing {
+        openAPI(path = "openapi", swaggerFile = "openapi/openapi.yaml")
+        swaggerUI("swagger", "openapi/openapi.yaml") {
+            version = "5.17.12"
+        }
+    }
+}
+
+@GenerateOpenApi
 private fun Application.configureRouting(audience: String, issuer: String, secret: String) {
     val productRepo: ProductRepository = DefaultProductRepository()
     val userRepo: UserRepository = DefaultUserRepository()

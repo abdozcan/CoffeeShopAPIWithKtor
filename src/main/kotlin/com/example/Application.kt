@@ -89,17 +89,17 @@ private fun Application.configureRouting(audience: String, issuer: String, secre
     val categoryRepo: CategoryRepository = DefaultCategoryRepository()
     val promoCodeRepo: PromoCodeRepository = DefaultPromoCodeRepository()
     val faqRepo: FaqRepository = DefaultFaqRepository()
+    val otpRepo: OtpRepository = DefaultOtpRepository()
 
-
+    categoryRoutes(categoryRepo)
     productRoutes(productRepo, userRepo)
-    userRoutes(userRepo)
-    authRoutes(userRepo, authManager)
+    userRoutes(userRepo, otpRepo)
+    authRoutes(userRepo, otpRepo, authManager)
     cartRoutes(cartRepo, userRepo, promoCodeRepo)
     favoriteRoutes(favoriteRepo, userRepo)
     reviewRoutes(reviewRepo, userRepo)
     orderRoutes(orderRepo, userRepo)
     addressRoutes(addressRepo, userRepo)
-    categoryRoutes(categoryRepo)
     `3DSecureRoutes`()
     faqRoutes(faqRepo)
 }
@@ -128,7 +128,8 @@ private fun Application.configureDatabase() {
                 PromoCodeTable,
                 PromoCodeUsageTable,
                 FaqTable,
-                FaqTranslationTable
+                FaqTranslationTable,
+                OtpTable
             )
         }
     }

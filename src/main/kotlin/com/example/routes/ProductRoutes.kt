@@ -6,6 +6,7 @@ import com.example.domain.repository.UserRepository
 import com.example.domain.utils.ProductSortOption
 import com.example.routes.utils.getAuthenticatedUsersId
 import com.example.routes.utils.getBy
+import io.github.tabilzad.ktor.annotations.Tag
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.plugins.*
@@ -13,6 +14,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
+@Tag(["Product"])
 fun Application.productRoutes(productRepo: ProductRepository, userRepo: UserRepository) = routing {
     route("/product") {
         getAll(productRepo)
@@ -87,7 +89,7 @@ fun Route.getNewest(repo: ProductRepository) = get("/newest/limit/{limit?}/page/
     } ?: throw MissingRequestParameterException("limit")
 }
 
-fun Route.getSpecialOffer(repo: ProductRepository) = get("/special_offer/limit/{limit?}/page/{page?}") {
+fun Route.getSpecialOffer(repo: ProductRepository) = get("/special-offer/limit/{limit?}/page/{page?}") {
     call.parameters["limit"]?.toInt()?.let { limit ->
         call.parameters["page"]?.toLong()?.let { page ->
             val offset = (page - 1) * limit

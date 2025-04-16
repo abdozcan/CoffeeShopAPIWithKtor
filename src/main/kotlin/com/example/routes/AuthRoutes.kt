@@ -6,6 +6,7 @@ import com.example.auth.model.RefreshToken
 import com.example.auth.model.Tokens
 import com.example.domain.model.RegisterUser
 import com.example.domain.repository.UserRepository
+import io.github.tabilzad.ktor.annotations.Tag
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -15,7 +16,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 
-fun Application.authRoutes(repo: UserRepository, authManager: AuthManager) = routing {
+@Tag(["Auth"])
+fun Application.authRoutes(userRepo: UserRepository, otpRepo: OtpRepository, authManager: AuthManager) = routing {
     route("auth") {
         refreshToken(authManager)
         login(repo, authManager)

@@ -7,6 +7,7 @@ import com.example.domain.repository.CartRepository
 import com.example.domain.repository.PromoCodeRepository
 import com.example.domain.repository.UserRepository
 import com.example.routes.utils.getAuthenticatedUsersId
+import io.github.tabilzad.ktor.annotations.Tag
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -14,6 +15,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
+@Tag(["Cart"])
 fun Application.cartRoutes(
     cartRepo: CartRepository,
     userRepo: UserRepository,
@@ -28,7 +30,7 @@ fun Application.cartRoutes(
     }
 }
 
-private fun Route.getItemsSize(repo: CartRepository, userRepo: UserRepository) = get("/cart/items_size") {
+private fun Route.getItemsSize(repo: CartRepository, userRepo: UserRepository) = get("/cart/items-size") {
     getAuthenticatedUsersId(userRepo = userRepo)?.let { userId ->
         repo.findAllByUserId(userId).getOrThrow().size.let { size ->
             call.respond(HttpStatusCode.OK, size)

@@ -1,5 +1,6 @@
 package com.example.routes
 
+import io.github.tabilzad.ktor.annotations.Tag
 import io.ktor.server.application.*
 import io.ktor.server.html.*
 import io.ktor.server.request.*
@@ -7,6 +8,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.html.*
 
+@Tag(["3D Secure"])
 fun Application.`3DSecureRoutes`() = routing {
     `3DSecureVerification`()
     `3DSecureCallback`()

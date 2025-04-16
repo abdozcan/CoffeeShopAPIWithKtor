@@ -6,6 +6,7 @@ import com.example.domain.repository.UserRepository
 import com.example.domain.utils.ProductSortOption
 import com.example.routes.utils.getAuthenticatedUsersId
 import com.example.routes.utils.getBy
+import io.github.tabilzad.ktor.annotations.Tag
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -13,6 +14,7 @@ import io.ktor.server.plugins.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
+@Tag(["Favorite"])
 fun Application.favoriteRoutes(favoriteRepo: FavoriteRepository, userRepo: UserRepository) = routing {
     authenticate {
         getAll(favoriteRepo, userRepo)

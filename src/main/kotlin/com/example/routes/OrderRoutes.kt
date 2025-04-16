@@ -6,6 +6,7 @@ import com.example.domain.repository.UserRepository
 import com.example.domain.utils.OrderSortOption
 import com.example.routes.utils.getAuthenticatedUsersId
 import com.example.routes.utils.getBy
+import io.github.tabilzad.ktor.annotations.Tag
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.plugins.*
@@ -13,6 +14,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
+@Tag(["Order"])
 fun Application.orderRoutes(orderRepo: OrderRepository, userRepo: UserRepository) = routing {
     authenticate {
         getAll(orderRepo, userRepo)

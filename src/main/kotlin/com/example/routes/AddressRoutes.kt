@@ -7,6 +7,7 @@ import com.example.domain.model.Address
 import com.example.domain.repository.AddressRepository
 import com.example.domain.repository.UserRepository
 import com.example.routes.utils.getAuthenticatedUsersId
+import io.github.tabilzad.ktor.annotations.Tag
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -15,6 +16,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
+@Tag(["Address"])
 fun Application.addressRoutes(
     addressRepo: AddressRepository,
     userRepo: UserRepository

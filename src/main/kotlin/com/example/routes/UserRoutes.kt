@@ -1,7 +1,9 @@
 package com.example.routes
 
+import com.example.auth.model.Credential
 import com.example.domain.model.ChangePasswordRequest
 import com.example.domain.model.User
+import com.example.domain.repository.OtpRepository
 import com.example.domain.repository.UserRepository
 import com.example.routes.utils.getAuthenticatedUsersId
 import io.github.tabilzad.ktor.annotations.Tag
@@ -24,6 +26,7 @@ fun Application.userRoutes(userRepo: UserRepository, otpRepo: OtpRepository) = r
         delete(userRepo)
         changePassword(userRepo)
     }
+    resetPassword(userRepo, otpRepo)
 }
 
 fun Route.getInfo(repo: UserRepository) = get("/user/info") {
@@ -85,6 +88,23 @@ fun Route.changePassword(repo: UserRepository) = put("/user/change-password") {
                         else "Something went wrong."
                     )
                 }
+        }
+    }
+}
+
+fun Route.resetPassword(userRepo: UserRepository, otpRepo: OtpRepository) = post("/user/reset-password") {
+    call.receive<Credential>().let { request ->
+        userRepo.resetPassword(
+            email = request.email,
+            password = request.password
+        ).onSuccess {
+            otpRepo.delete(email = request.email).onSuccess {
+                call.respond(HttpStatusCode.OK, "Password reset successfully")
+            }.onFailure {
+                call.respond(HttpStatusCode.InternalServerError, "Something went wrong")
+            }
+        }.onFailure {
+            call.respond(HttpStatusCode.InternalServerError, "Something went wrong")
         }
     }
 }

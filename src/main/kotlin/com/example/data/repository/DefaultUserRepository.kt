@@ -7,6 +7,7 @@ import com.example.data.utils.doOrThrowIfNull
 import com.example.data.utils.withTransactionContext
 import com.example.domain.model.User
 import com.example.domain.repository.UserRepository
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 
 class DefaultUserRepository : UserRepository {
@@ -79,4 +80,12 @@ class DefaultUserRepository : UserRepository {
                 }
             }
         }
+
+    override suspend fun resetPassword(email: String, password: String): Result<Unit> = runCatching {
+        withTransactionContext {
+            UserEntity.findSingleByAndUpdate(UserTable.email eq email) {
+                it.password = password
+            }
+        }
+    }
 }
